@@ -1,0 +1,706 @@
+{
+  "timestamp": "2025-11-06T23:57:16.075Z",
+  "endpoint": "http://localhost:4000/graphql",
+  "tests": [
+    {
+      "name": "Basic Connectivity Test",
+      "query": "query { __typename }",
+      "duration": 37,
+      "memoryDelta": {
+        "rss": 3301376,
+        "heapUsed": 185112,
+        "external": 12963
+      },
+      "responseSize": 31,
+      "success": true,
+      "hasData": true,
+      "errorCount": 0,
+      "statusCode": 200,
+      "expectedResult": {
+        "shouldHaveIntrospection": false
+      },
+      "resultMatches": true
+    },
+    {
+      "name": "Introspection Attack",
+      "query": "query IntrospectionAttack {\n        __schema {\n          types {\n            name\n            kind\n            fields {\n              name\n              type {\n                name\n              }\n   ...",
+      "duration": 8,
+      "memoryDelta": {
+        "rss": 49152,
+        "heapUsed": 136576,
+        "external": 6608
+      },
+      "responseSize": 3168,
+      "success": true,
+      "hasData": true,
+      "errorCount": 0,
+      "statusCode": 200,
+      "expectedResult": {
+        "shouldHaveIntrospection": true
+      },
+      "resultMatches": {
+        "types": [
+          {
+            "name": "User",
+            "kind": "OBJECT",
+            "fields": [
+              {
+                "name": "id",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "name",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "email",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "posts",
+                "type": {
+                  "name": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "ID",
+            "kind": "SCALAR",
+            "fields": null
+          },
+          {
+            "name": "String",
+            "kind": "SCALAR",
+            "fields": null
+          },
+          {
+            "name": "Post",
+            "kind": "OBJECT",
+            "fields": [
+              {
+                "name": "id",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "title",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "body",
+                "type": {
+                  "name": "String"
+                }
+              },
+              {
+                "name": "author",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "comments",
+                "type": {
+                  "name": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "Comment",
+            "kind": "OBJECT",
+            "fields": [
+              {
+                "name": "id",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "text",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "author",
+                "type": {
+                  "name": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "Query",
+            "kind": "OBJECT",
+            "fields": [
+              {
+                "name": "me",
+                "type": {
+                  "name": "User"
+                }
+              },
+              {
+                "name": "users",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "posts",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "postsByEmail",
+                "type": {
+                  "name": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "Mutation",
+            "kind": "OBJECT",
+            "fields": [
+              {
+                "name": "deleteUser",
+                "type": {
+                  "name": "Boolean"
+                }
+              },
+              {
+                "name": "addPost",
+                "type": {
+                  "name": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "Boolean",
+            "kind": "SCALAR",
+            "fields": null
+          },
+          {
+            "name": "__Schema",
+            "kind": "OBJECT",
+            "fields": [
+              {
+                "name": "description",
+                "type": {
+                  "name": "String"
+                }
+              },
+              {
+                "name": "types",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "queryType",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "mutationType",
+                "type": {
+                  "name": "__Type"
+                }
+              },
+              {
+                "name": "subscriptionType",
+                "type": {
+                  "name": "__Type"
+                }
+              },
+              {
+                "name": "directives",
+                "type": {
+                  "name": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "__Type",
+            "kind": "OBJECT",
+            "fields": [
+              {
+                "name": "kind",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "name",
+                "type": {
+                  "name": "String"
+                }
+              },
+              {
+                "name": "description",
+                "type": {
+                  "name": "String"
+                }
+              },
+              {
+                "name": "specifiedByURL",
+                "type": {
+                  "name": "String"
+                }
+              },
+              {
+                "name": "fields",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "interfaces",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "possibleTypes",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "enumValues",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "inputFields",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "ofType",
+                "type": {
+                  "name": "__Type"
+                }
+              },
+              {
+                "name": "isOneOf",
+                "type": {
+                  "name": "Boolean"
+                }
+              }
+            ]
+          },
+          {
+            "name": "__TypeKind",
+            "kind": "ENUM",
+            "fields": null
+          },
+          {
+            "name": "__Field",
+            "kind": "OBJECT",
+            "fields": [
+              {
+                "name": "name",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "description",
+                "type": {
+                  "name": "String"
+                }
+              },
+              {
+                "name": "args",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "type",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "isDeprecated",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "deprecationReason",
+                "type": {
+                  "name": "String"
+                }
+              }
+            ]
+          },
+          {
+            "name": "__InputValue",
+            "kind": "OBJECT",
+            "fields": [
+              {
+                "name": "name",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "description",
+                "type": {
+                  "name": "String"
+                }
+              },
+              {
+                "name": "type",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "defaultValue",
+                "type": {
+                  "name": "String"
+                }
+              },
+              {
+                "name": "isDeprecated",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "deprecationReason",
+                "type": {
+                  "name": "String"
+                }
+              }
+            ]
+          },
+          {
+            "name": "__EnumValue",
+            "kind": "OBJECT",
+            "fields": [
+              {
+                "name": "name",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "description",
+                "type": {
+                  "name": "String"
+                }
+              },
+              {
+                "name": "isDeprecated",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "deprecationReason",
+                "type": {
+                  "name": "String"
+                }
+              }
+            ]
+          },
+          {
+            "name": "__Directive",
+            "kind": "OBJECT",
+            "fields": [
+              {
+                "name": "name",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "description",
+                "type": {
+                  "name": "String"
+                }
+              },
+              {
+                "name": "isRepeatable",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "locations",
+                "type": {
+                  "name": null
+                }
+              },
+              {
+                "name": "args",
+                "type": {
+                  "name": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "__DirectiveLocation",
+            "kind": "ENUM",
+            "fields": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "Deep Query Attack (Depth 1)",
+      "query": "query DeepQuery { users { posts { id } }",
+      "duration": 5,
+      "memoryDelta": {
+        "rss": 24576,
+        "heapUsed": 83776,
+        "external": 4093
+      },
+      "responseSize": 1906,
+      "success": false,
+      "hasData": false,
+      "errorCount": 1,
+      "statusCode": 400
+    },
+    {
+      "name": "Deep Query Attack (Depth 2)",
+      "query": "query DeepQuery { users { posts { comments { id } } }",
+      "duration": 5,
+      "memoryDelta": {
+        "rss": 12288,
+        "heapUsed": 69800,
+        "external": 4093
+      },
+      "responseSize": 1906,
+      "success": false,
+      "hasData": false,
+      "errorCount": 1,
+      "statusCode": 400
+    },
+    {
+      "name": "Deep Query Attack (Depth 3)",
+      "query": "query DeepQuery { users { posts { comments { posts { id } } } }",
+      "duration": 6,
+      "memoryDelta": {
+        "rss": 32768,
+        "heapUsed": 99288,
+        "external": 4093
+      },
+      "responseSize": 1906,
+      "success": false,
+      "hasData": false,
+      "errorCount": 1,
+      "statusCode": 400
+    },
+    {
+      "name": "Deep Query Attack (Depth 4)",
+      "query": "query DeepQuery { users { posts { comments { posts { comments { id } } } } }",
+      "duration": 6,
+      "memoryDelta": {
+        "rss": 69632,
+        "heapUsed": 76768,
+        "external": 4093
+      },
+      "responseSize": 1906,
+      "success": false,
+      "hasData": false,
+      "errorCount": 1,
+      "statusCode": 400
+    },
+    {
+      "name": "Deep Query Attack (Depth 5)",
+      "query": "query DeepQuery { users { posts { comments { posts { comments { posts { id } } } } } }",
+      "duration": 6,
+      "memoryDelta": {
+        "rss": 73728,
+        "heapUsed": 67848,
+        "external": 4093
+      },
+      "responseSize": 1906,
+      "success": false,
+      "hasData": false,
+      "errorCount": 1,
+      "statusCode": 400
+    },
+    {
+      "name": "Deep Query Attack (Depth 6)",
+      "query": "query DeepQuery { users { posts { comments { posts { comments { posts { comments { id } } } } } } }",
+      "duration": 6,
+      "memoryDelta": {
+        "rss": 94208,
+        "heapUsed": 80064,
+        "external": 4093
+      },
+      "responseSize": 1906,
+      "success": false,
+      "hasData": false,
+      "errorCount": 1,
+      "statusCode": 400
+    },
+    {
+      "name": "Deep Query Attack (Depth 7)",
+      "query": "query DeepQuery { users { posts { comments { posts { comments { posts { comments { posts { id } } } } } } } }",
+      "duration": 7,
+      "memoryDelta": {
+        "rss": 253952,
+        "heapUsed": 225120,
+        "external": 12285
+      },
+      "responseSize": 1906,
+      "success": false,
+      "hasData": false,
+      "errorCount": 1,
+      "statusCode": 400,
+      "expectedResult": {
+        "shouldTimeout": true
+      },
+      "resultMatches": false
+    },
+    {
+      "name": "Deep Query Attack (Depth 8)",
+      "query": "query DeepQuery { users { posts { comments { posts { comments { posts { comments { posts { comments { id } } } } } } } } }",
+      "duration": 6,
+      "memoryDelta": {
+        "rss": 98304,
+        "heapUsed": 65984,
+        "external": 4093
+      },
+      "responseSize": 1906,
+      "success": false,
+      "hasData": false,
+      "errorCount": 1,
+      "statusCode": 400,
+      "expectedResult": {
+        "shouldTimeout": true
+      },
+      "resultMatches": false
+    },
+    {
+      "name": "Complex Query Attack (10 fields)",
+      "query": "query ComplexQuery {  field0: users { id name email } field1: users { id name email } field2: users { id name email } field3: users { id name email } field4: users { id name email } field5: users { id...",
+      "duration": 8,
+      "memoryDelta": {
+        "rss": 81920,
+        "heapUsed": 76240,
+        "external": 3752
+      },
+      "responseSize": 1740,
+      "success": true,
+      "hasData": true,
+      "errorCount": 0,
+      "statusCode": 200
+    },
+    {
+      "name": "Complex Query Attack (40 fields)",
+      "query": "query ComplexQuery {  field0: users { id name email } field1: users { id name email } field2: users { id name email } field3: users { id name email } field4: users { id name email } field5: users { id...",
+      "duration": 25,
+      "memoryDelta": {
+        "rss": 65536,
+        "heapUsed": 55936,
+        "external": 14193
+      },
+      "responseSize": 6960,
+      "success": true,
+      "hasData": true,
+      "errorCount": 0,
+      "statusCode": 200
+    },
+    {
+      "name": "Complex Query Attack (70 fields)",
+      "query": "query ComplexQuery {  field0: users { id name email } field1: users { id name email } field2: users { id name email } field3: users { id name email } field4: users { id name email } field5: users { id...",
+      "duration": 42,
+      "memoryDelta": {
+        "rss": 110592,
+        "heapUsed": 66520,
+        "external": 32826
+      },
+      "responseSize": 12180,
+      "success": true,
+      "hasData": true,
+      "errorCount": 0,
+      "statusCode": 200
+    },
+    {
+      "name": "Complex Query Attack (100 fields)",
+      "query": "query ComplexQuery {  field0: users { id name email } field1: users { id name email } field2: users { id name email } field3: users { id name email } field4: users { id name email } field5: users { id...",
+      "duration": 37,
+      "memoryDelta": {
+        "rss": 925696,
+        "heapUsed": -993112,
+        "external": -82714
+      },
+      "responseSize": 17400,
+      "success": true,
+      "hasData": true,
+      "errorCount": 0,
+      "statusCode": 200
+    },
+    {
+      "name": "Resource Exhaustion (50 aliases)",
+      "query": "query AliasedQuery {  alias0: users { id name email posts { title } } alias1: users { id name email posts { title } } alias2: users { id name email posts { title } } alias3: users { id name email post...",
+      "duration": 55,
+      "memoryDelta": {
+        "rss": 16384,
+        "heapUsed": 58352,
+        "external": 29074
+      },
+      "responseSize": 14400,
+      "success": true,
+      "hasData": true,
+      "errorCount": 0,
+      "statusCode": 200
+    },
+    {
+      "name": "Authorization Bypass Test",
+      "query": "query UnauthorizedAccess {\n        users {\n          id\n          email\n          posts {\n            title\n            body\n          }\n        }\n      }",
+      "duration": 5,
+      "memoryDelta": {
+        "rss": 8192,
+        "heapUsed": 53360,
+        "external": 9173
+      },
+      "responseSize": 355,
+      "success": true,
+      "hasData": true,
+      "errorCount": 0,
+      "statusCode": 200
+    }
+  ],
+  "summary": {
+    "totalTests": 16,
+    "successful": 8,
+    "failed": 8,
+    "averageDuration": 17,
+    "vulnerabilities": [
+      {
+        "type": "Information Disclosure",
+        "severity": "High",
+        "description": "GraphQL schema introspection is enabled",
+        "evidence": "Introspection query returned schema data"
+      }
+    ]
+  }
+}
