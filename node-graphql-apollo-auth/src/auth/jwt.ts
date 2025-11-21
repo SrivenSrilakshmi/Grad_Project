@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
-import { UserDocument } from '../modules/user/user.model';
 
-const JWT_SECRET = process.env.JWT_SECRET as string;
+const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-key';
 const EXPIRES_IN = '7d';
 
 export const signToken = (user: { id: string; role: string }) => {

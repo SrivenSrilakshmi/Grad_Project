@@ -22,7 +22,7 @@ async function start() {
   } as any);
 
   await server.start();
-  server.applyMiddleware({ app });
+  server.applyMiddleware({ app: app as any });
 
   const port = process.env.PORT || 4001;
   app.listen(port, () => console.log(`HARDENED server running at http://localhost:${port}${server.graphqlPath}`));

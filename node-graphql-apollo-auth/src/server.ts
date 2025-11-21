@@ -1,9 +1,9 @@
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
+import depthLimit from 'graphql-depth-limit';
 import typeDefs from './schema/typeDefs';
 import { resolvers } from './schema/resolvers';
 import { createContext } from './context';
-import { depthLimit } from './middleware/depthLimit.middleware';
 import costAnalysis from './middleware/costAnalysis.middleware';
 import validationMiddleware from './middleware/validation.middleware';
 import { authenticate } from './auth/auth.middleware';
@@ -24,8 +24,7 @@ const server = new ApolloServer({
 });
 
 // Apply Apollo GraphQL middleware
-// Apply Apollo GraphQL middleware
-server.applyMiddleware({ app: app as express.Application });
+server.applyMiddleware({ app: app as any });
 
 // Start the server
 const PORT = config.PORT || 4000;

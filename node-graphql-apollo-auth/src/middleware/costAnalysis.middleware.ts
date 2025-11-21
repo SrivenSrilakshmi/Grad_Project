@@ -1,24 +1,19 @@
-import { GraphQLObjectType, GraphQLInt } from 'graphql';
-import { ApolloServerPlugin } from '@apollo/server';
-import { createComplexityLimitRule } from 'graphql-validation-complexity';
+import { createComplexityRule, simpleEstimator, fieldExtensionsEstimator } from 'graphql-query-complexity';
+import { GraphQLError } from 'graphql';
 
-const complexityLimitRule = createComplexityLimitRule(100, {
-  onCost: (cost) => {
-    console.log(`Query cost: ${cost}`);
+// Create a complexity analysis rule
+const costAnalysisMiddleware = createComplexityRule({
+  maximumComplexity: 100,
+  estimators: [
+    fieldExtensionsEstimator(),
+    simpleEstimator({ defaultComplexity: 1 })
+  ],
+  onComplete: (complexity: number) => {
+    console.log(`Query complexity: ${complexity}`);
+  },
+  createError: (max: number, actual: number) => {
+    return new GraphQLError(`Query complexity ${actual} exceeds maximum allowed complexity ${max}`);
   },
 });
-
-const costAnalysisMiddleware = ApolloServerPlugin {
-  requestDidStart() {
-    return {
-      didResolveOperation({ request, document }) {
-        const complexity = complexityLimitRule(document);
-        if (complexity > 100) {
-          throw new Error(`Query is too complex: ${complexity}`);
-        }
-      },
-    };
-  },
-};
 
 export default costAnalysisMiddleware;
