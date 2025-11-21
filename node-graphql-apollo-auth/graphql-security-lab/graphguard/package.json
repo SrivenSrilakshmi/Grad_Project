@@ -1,0 +1,57 @@
+{
+  "name": "graphguard",
+  "version": "1.0.0",
+  "description": "Intelligent GraphQL Security Layer with AI-inspired threat detection",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "test:security": "jest --testPathPattern=security",
+    "test:coverage": "jest --coverage",
+    "benchmark": "node benchmarks/performance.js",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "validate": "npm run lint && npm run test"
+  },
+  "keywords": [
+    "graphql",
+    "security",
+    "middleware",
+    "apollo",
+    "protection",
+    "firewall",
+    "threat-detection",
+    "query-analysis"
+  ],
+  "author": "GraphQL Security Research Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/graphguard"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/graphguard/issues"
+  },
+  "homepage": "https://github.com/your-org/graphguard#readme",
+  "dependencies": {
+    "graphql": "^16.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "peerDependencies": {
+    "apollo-server-express": "^3.0.0",
+    "apollo-server-core": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "files": [
+    "lib/",
+    "types/",
+    "README.md",
+    "LICENSE"
+  ]
+}

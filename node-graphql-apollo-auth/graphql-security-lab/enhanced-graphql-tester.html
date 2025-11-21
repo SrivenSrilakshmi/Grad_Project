@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛡️ GraphQL Security Testing Dashboard</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+            --dark-bg: #1f2937;
+            --card-bg: #f9fafb;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: var(--dark-bg);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: rgba(5, 150, 105, 0.1);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .section {
+            background: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: white;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            color: var(--dark-bg);
+        }
+
+        .section-content {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark-bg);
+        }
+
+        .server-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .server-option {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .server-option.active {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+            color: var(--primary-color);
+        }
+
+        .server-option.vulnerable {
+            border-color: var(--danger-color);
+            color: var(--danger-color);
+        }
+
+        .server-option.hardened {
+            border-color: var(--success-color);
+            color: var(--success-color);
+        }
+
+        .auth-section {
+            display: flex;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .auth-section select,
+        .auth-section input {
+            flex: 1;
+        }
+
+        select, input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        textarea {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            height: 200px;
+            resize: vertical;
+        }
+
+        .quick-queries {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .quick-query-btn {
+            padding: 8px 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.2s;
+        }
+
+        .quick-query-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .quick-query-btn.attack {
+            background: var(--danger-color);
+        }
+
+        .quick-query-btn.attack:hover {
+            background: #b91c1c;
+        }
+
+        .execute-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .execute-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .execute-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .response-section {
+            grid-column: 1 / -1;
+        }
+
+        .response-content {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            background: var(--dark-bg);
+            color: #10b981;
+            padding: 20px;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .error {
+            color: #ef4444;
+        }
+
+        .warning {
+            color: #f59e0b;
+        }
+
+        .success {
+            color: #10b981;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .attack-scenarios {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .scenario-btn {
+            padding: 12px;
+            background: var(--warning-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        .scenario-btn:hover {
+            background: #b45309;
+        }
+
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 6px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success { background: var(--success-color); }
+        .toast.error { background: var(--danger-color); }
+        .toast.warning { background: var(--warning-color); }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .quick-queries {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ GraphQL Security Testing Dashboard</h1>
+            <div class="status-indicator">
+                <span class="status-dot">●</span>
+                <span id="connectionStatus">Checking connection...</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Server Configuration -->
+            <div class="section">
+                <div class="section-header">🔧 Server Configuration</div>
+                <div class="section-content">
+                    <div class="form-group">
+                        <label>Select Server:</label>
+                        <div class="server-selector">
+                            <div class="server-option hardened active" data-server="hardened">
+                                🛡️ Hardened<br>
+                                <small>:4001</small>
+                            </div>
+                            <div class="server-option vulnerable" data-server="vulnerable">
+                                ⚠️ Vulnerable<br>
+                                <small>:4000</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Authentication:</label>
+                        <div class="auth-section">
+                            <select id="authType">
+                                <option value="">No Authentication</option>
+                                <option value="user">User Token</option>
+                                <option value="admin">Admin Token</option>
+                                <option value="custom">Custom Token</option>
+                            </select>
+                            <input type="text" id="customToken" placeholder="Custom JWT Token" style="display: none;">
+                        </div>
+                    </div>
+
+                    <div class="metrics">
+                        <div class="metric-card">
+                            <div class="metric-value" id="totalQueries">0</div>
+                            <div class="metric-label">Total Queries</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="avgResponseTime">0ms</div>
+                            <div class="metric-label">Avg Response</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="successRate">100%</div>
+                            <div class="metric-label">Success Rate</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Query Builder -->
+            <div class="section">
+                <div class="section-header">📝 Query Builder</div>
+                <div class="section-content">
+                    <div class="form-group">
+                        <label>Quick Queries:</label>
+                        <div class="quick-queries">
+                            <button class="quick-query-btn" onclick="loadQuery('basic')">📋 Basic Query</button>
+                            <button class="quick-query-btn" onclick="loadQuery('users')">👥 Users Query</button>
+                            <button class="quick-query-btn" onclick="loadQuery('introspection')">🔍 Introspection</button>
+                            <button class="quick-query-btn attack" onclick="loadQuery('deep')">🎯 Deep Query</button>
+                            <button class="quick-query-btn attack" onclick="loadQuery('alias')">⚡ Alias Flood</button>
+                            <button class="quick-query-btn attack" onclick="loadQuery('complex')">🔥 Complex Query</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>GraphQL Query:</label>
+                        <textarea id="queryInput" placeholder="Enter your GraphQL query here...">query {
+  posts {
+    id
+    title
+    author {
+      name
+    }
+  }
+}</textarea>
+                    </div>
+
+                    <button class="execute-btn" onclick="executeQuery()">
+                        🚀 Execute Query
+                    </button>
+                </div>
+            </div>
+
+            <!-- Attack Scenarios -->
+            <div class="section">
+                <div class="section-header">⚔️ Security Attack Scenarios</div>
+                <div class="section-content">
+                    <div class="attack-scenarios">
+                        <button class="scenario-btn" onclick="runAttackScenario('depthBomb')">
+                            💣 Depth Bomb
+                        </button>
+                        <button class="scenario-btn" onclick="runAttackScenario('aliasFlood')">
+                            🌊 Alias Flood
+                        </button>
+                        <button class="scenario-btn" onclick="runAttackScenario('introspectionHack')">
+                            🕵️ Schema Introspection
+                        </button>
+                        <button class="scenario-btn" onclick="runAttackScenario('injectionTest')">
+                            💉 Injection Test
+                        </button>
+                        <button class="scenario-btn" onclick="runAttackScenario('rateLimitTest')">
+                            🚀 Rate Limit Test
+                        </button>
+                        <button class="scenario-btn" onclick="runAttackScenario('authBypass')">
+                            🔐 Auth Bypass
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Response Display -->
+            <div class="section response-section">
+                <div class="section-header">📊 Response & Analysis</div>
+                <div class="section-content">
+                    <div id="responseOutput" class="response-content">
+Ready to execute GraphQL queries! 🚀
+
+Select a server, choose your authentication method, and run a query to see the results here.
+
+🛡️ Hardened Server Features:
+- GraphGuard intelligent security layer
+- Query depth limiting (max 7 levels)
+- Authentication & authorization required
+- Input validation with Zod schemas
+- Rate limiting protection
+
+⚠️ Vulnerable Server:
+- No security controls
+- Unlimited query depth
+- No authentication required
+- Exposed to all attack vectors
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const servers = {
+            hardened: 'http://localhost:4001/graphql',
+            vulnerable: 'http://localhost:4000/graphql'
+        };
+
+        // Test tokens (generated by hardened server)
+        const tokens = {
+            user: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxIiwiaWF0IjoxNzYzNjkxNTM4LCJleHAiOjE3NjM2OTUxMzh9.rtqCJOLjzJVkzZbG3E6PY-63iM6uOjLHVP5kMGB9yUM',
+            admin: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIzIiwiaWF0IjoxNzYzNjkxNTM4LCJleHAiOjE3NjM2OTUxMzh9.YIFxQavsxj0v2iuXTY0mKp3lZ7PeCQCzjlIoWS8Tkw4'
+        };
+
+        let currentServer = 'hardened';
+        let metrics = { total: 0, responses: [], totalTime: 0 };
+
+        // Query templates
+        const queries = {
+            basic: `query {
+  posts {
+    id
+    title
+    author {
+      name
+    }
+  }
+}`,
+            users: `query {
+  users {
+    id
+    name
+    email
+  }
+}`,
+            introspection: `query IntrospectionQuery {
+  __schema {
+    types {
+      name
+      kind
+      description
+    }
+  }
+}`,
+            deep: `query DeepQuery {
+  posts {
+    author {
+      posts {
+        author {
+          posts {
+            author {
+              posts {
+                author {
+                  posts {
+                    title
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`,
+            alias: `query AliasFlood {
+  ${Array.from({length: 30}, (_, i) => `a${i}: posts { id title }`).join('\n  ')}
+}`,
+            complex: `query ComplexQuery {
+  posts {
+    id
+    title
+    body
+    author {
+      id
+      name
+      email
+      posts {
+        id
+        title
+        comments {
+          id
+          text
+          author {
+            id
+            name
+            posts {
+              id
+              title
+            }
+          }
+        }
+      }
+    }
+    comments {
+      id
+      text
+      author {
+        id
+        name
+        posts {
+          id
+          title
+        }
+      }
+    }
+  }
+}`
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkServerStatus();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Server selection
+            document.querySelectorAll('.server-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.server-option').forEach(o => o.classList.remove('active'));
+                    this.classList.add('active');
+                    currentServer = this.dataset.server;
+                    checkServerStatus();
+                });
+            });
+
+            // Auth type selection
+            document.getElementById('authType').addEventListener('change', function() {
+                const customToken = document.getElementById('customToken');
+                if (this.value === 'custom') {
+                    customToken.style.display = 'block';
+                } else {
+                    customToken.style.display = 'none';
+                }
+            });
+        }
+
+        async function checkServerStatus() {
+            const statusElement = document.getElementById('connectionStatus');
+            try {
+                const response = await fetch(servers[currentServer], {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: '{ __typename }' })
+                });
+                
+                if (response.ok) {
+                    statusElement.textContent = `Connected to ${currentServer} server`;
+                    statusElement.parentElement.style.background = 'rgba(5, 150, 105, 0.1)';
+                    statusElement.parentElement.style.borderColor = 'var(--success-color)';
+                    statusElement.parentElement.style.color = 'var(--success-color)';
+                } else {
+                    throw new Error('Server not responding');
+                }
+            } catch (error) {
+                statusElement.textContent = `${currentServer} server offline`;
+                statusElement.parentElement.style.background = 'rgba(220, 38, 38, 0.1)';
+                statusElement.parentElement.style.borderColor = 'var(--danger-color)';
+                statusElement.parentElement.style.color = 'var(--danger-color)';
+            }
+        }
+
+        function loadQuery(type) {
+            document.getElementById('queryInput').value = queries[type];
+        }
+
+        async function executeQuery() {
+            const query = document.getElementById('queryInput').value;
+            const authType = document.getElementById('authType').value;
+            const customToken = document.getElementById('customToken').value;
+            
+            if (!query.trim()) {
+                showToast('Please enter a GraphQL query', 'warning');
+                return;
+            }
+
+            const startTime = Date.now();
+            const executeBtn = document.querySelector('.execute-btn');
+            const responseOutput = document.getElementById('responseOutput');
+
+            // Show loading state
+            executeBtn.disabled = true;
+            executeBtn.textContent = '⏳ Executing...';
+            responseOutput.textContent = 'Executing query...\n';
+
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                
+                // Add authentication if selected
+                if (authType && authType !== 'custom') {
+                    headers['Authorization'] = `Bearer ${tokens[authType]}`;
+                } else if (authType === 'custom' && customToken) {
+                    headers['Authorization'] = `Bearer ${customToken}`;
+                }
+
+                const response = await fetch(servers[currentServer], {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({ query })
+                });
+
+                const endTime = Date.now();
+                const responseTime = endTime - startTime;
+                const result = await response.json();
+
+                // Update metrics
+                updateMetrics(response.ok, responseTime);
+
+                // Display response
+                displayResponse(result, response, responseTime, query);
+
+                if (response.ok && !result.errors) {
+                    showToast('Query executed successfully!', 'success');
+                } else {
+                    showToast('Query completed with issues', 'warning');
+                }
+
+            } catch (error) {
+                const endTime = Date.now();
+                const responseTime = endTime - startTime;
+                
+                updateMetrics(false, responseTime);
+                displayResponse({ error: error.message }, null, responseTime, query);
+                showToast('Query execution failed', 'error');
+            }
+
+            // Reset button
+            executeBtn.disabled = false;
+            executeBtn.textContent = '🚀 Execute Query';
+        }
+
+        function displayResponse(result, response, responseTime, query) {
+            const output = document.getElementById('responseOutput');
+            
+            let displayText = `🚀 Query Executed (${responseTime}ms)\n`;
+            displayText += `📡 Server: ${currentServer} (${servers[currentServer]})\n`;
+            displayText += `🔐 Auth: ${document.getElementById('authType').value || 'None'}\n`;
+            displayText += `⏱️ Response Time: ${responseTime}ms\n`;
+            
+            if (response) {
+                displayText += `📊 Status: ${response.status} ${response.statusText}\n`;
+            }
+            
+            displayText += `\n📝 Query:\n${query}\n\n`;
+            
+            if (result.errors) {
+                displayText += `❌ ERRORS:\n`;
+                result.errors.forEach((error, i) => {
+                    displayText += `${i + 1}. ${error.message}\n`;
+                    if (error.extensions) {
+                        displayText += `   Extensions: ${JSON.stringify(error.extensions, null, 2)}\n`;
+                    }
+                });
+                displayText += `\n`;
+            }
+            
+            if (result.data) {
+                displayText += `✅ DATA:\n${JSON.stringify(result.data, null, 2)}\n`;
+            }
+            
+            if (result.error) {
+                displayText += `💥 NETWORK ERROR:\n${result.error}\n`;
+            }
+
+            // Security analysis
+            displayText += `\n🔍 SECURITY ANALYSIS:\n`;
+            displayText += analyzeQuerySecurity(query, result);
+
+            output.textContent = displayText;
+            
+            // Scroll to bottom
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function analyzeQuerySecurity(query, result) {
+            let analysis = '';
+            
+            // Check query depth
+            const depth = calculateQueryDepth(query);
+            analysis += `📏 Query Depth: ${depth}${depth > 7 ? ' ⚠️ HIGH' : ' ✅ OK'}\n`;
+            
+            // Check for introspection
+            if (query.includes('__schema') || query.includes('__type')) {
+                analysis += `🔍 Introspection: DETECTED ⚠️\n`;
+            }
+            
+            // Check for aliases
+            const aliasCount = (query.match(/\w+:/g) || []).length;
+            analysis += `🏷️ Aliases: ${aliasCount}${aliasCount > 20 ? ' ⚠️ HIGH' : ' ✅ OK'}\n`;
+            
+            // Check query length
+            analysis += `📐 Query Length: ${query.length} chars${query.length > 2000 ? ' ⚠️ LARGE' : ' ✅ OK'}\n`;
+            
+            // Security verdict
+            if (result.errors) {
+                const securityBlocked = result.errors.some(e => 
+                    e.message.includes('GraphGuard') || 
+                    e.message.includes('depth') || 
+                    e.message.includes('complexity')
+                );
+                analysis += `🛡️ Security: ${securityBlocked ? 'BLOCKED BY SECURITY CONTROLS' : 'ERROR (Not security related)'}\n`;
+            } else {
+                analysis += `🛡️ Security: QUERY ALLOWED\n`;
+            }
+            
+            return analysis;
+        }
+
+        function calculateQueryDepth(query) {
+            const openBraces = (query.match(/{/g) || []).length;
+            const closeBraces = (query.match(/}/g) || []).length;
+            return Math.min(openBraces, closeBraces);
+        }
+
+        function updateMetrics(success, responseTime) {
+            metrics.total++;
+            metrics.responses.push({ success, time: responseTime });
+            metrics.totalTime += responseTime;
+            
+            // Keep only last 100 responses
+            if (metrics.responses.length > 100) {
+                metrics.responses.shift();
+            }
+            
+            // Update UI
+            document.getElementById('totalQueries').textContent = metrics.total;
+            document.getElementById('avgResponseTime').textContent = Math.round(metrics.totalTime / metrics.total) + 'ms';
+            
+            const successCount = metrics.responses.filter(r => r.success).length;
+            const successRate = Math.round((successCount / metrics.responses.length) * 100);
+            document.getElementById('successRate').textContent = successRate + '%';
+        }
+
+        async function runAttackScenario(scenario) {
+            showToast(`Running ${scenario} attack scenario...`, 'warning');
+            
+            switch (scenario) {
+                case 'depthBomb':
+                    loadQuery('deep');
+                    await executeQuery();
+                    break;
+                case 'aliasFlood':
+                    loadQuery('alias');
+                    await executeQuery();
+                    break;
+                case 'introspectionHack':
+                    loadQuery('introspection');
+                    await executeQuery();
+                    break;
+                case 'injectionTest':
+                    document.getElementById('queryInput').value = `query {
+  postsByEmail(email: "'; DROP TABLE users; --") {
+    id
+    title
+  }
+}`;
+                    await executeQuery();
+                    break;
+                case 'rateLimitTest':
+                    showToast('Running rate limit test (10 rapid requests)...', 'warning');
+                    for (let i = 0; i < 10; i++) {
+                        setTimeout(() => executeQuery(), i * 100);
+                    }
+                    break;
+                case 'authBypass':
+                    document.getElementById('authType').value = '';
+                    loadQuery('users');
+                    await executeQuery();
+                    break;
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
+        }
+
+        // Auto-refresh server status every 30 seconds
+        setInterval(checkServerStatus, 30000);
+    </script>
+</body>
+</html>
