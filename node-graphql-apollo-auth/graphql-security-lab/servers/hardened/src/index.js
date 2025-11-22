@@ -281,7 +281,7 @@ async function startHardenedServer() {
   
   // Security middleware
   app.use(cors({
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
+    origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000', 'http://localhost:8080'],
     credentials: true
   }));
   
