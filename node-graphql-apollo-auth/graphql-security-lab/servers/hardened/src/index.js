@@ -368,7 +368,7 @@ async function startHardenedServer() {
   await server.start();
   server.applyMiddleware({ app });
 
-  const port = process.env.PORT || 4001; // Different port from vulnerable server
+  const port = process.env.PORT || 4002; // Different port from vulnerable server
   app.listen(port, () => {
     console.log('🛡️  HARDENED GraphQL Server Started');
     console.log('===================================');

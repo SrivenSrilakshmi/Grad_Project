@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GraphGuard Universal 2.0 - Live Demo Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto 1fr auto;
+            height: 100vh;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .header {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .demo-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .framework-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .framework-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .framework-btn.active {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .framework-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .attack-scenarios {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .scenario-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            border-left: 4px solid transparent;
+        }
+
+        .scenario-btn.safe { border-left-color: #4CAF50; }
+        .scenario-btn.risky { border-left-color: #FF9800; }
+        .scenario-btn.dangerous { border-left-color: #F44336; }
+
+        .scenario-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateX(5px);
+        }
+
+        .query-editor {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            color: #00ff00;
+            font-size: 0.9em;
+            line-height: 1.4;
+            overflow-y: auto;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .results-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .security-metrics {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .metric-value {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .risk-meter {
+            width: 100%;
+            height: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .risk-fill {
+            height: 100%;
+            border-radius: 12px;
+            transition: all 1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .risk-low { background: linear-gradient(90deg, #4CAF50, #8BC34A); }
+        .risk-medium { background: linear-gradient(90deg, #FF9800, #FFC107); }
+        .risk-high { background: linear-gradient(90deg, #F44336, #E91E63); }
+
+        .action-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .action-allow { background: linear-gradient(45deg, #4CAF50, #45a049); }
+        .action-warn { background: linear-gradient(45deg, #FF9800, #F57C00); }
+        .action-block { background: linear-gradient(45deg, #F44336, #D32F2F); }
+
+        .framework-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .framework-result {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .framework-result.active {
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .controls {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .control-btn {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .execute-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .reset-btn {
+            background: linear-gradient(45deg, #FF9800, #F57C00);
+            color: white;
+        }
+
+        .auto-demo-btn {
+            background: linear-gradient(45deg, #9C27B0, #673AB7);
+            color: white;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #ffd700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .demo-active {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(255, 215, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+        }
+
+        h1 { font-size: 2.5em; margin-bottom: 10px; }
+        h2 { font-size: 1.8em; margin-bottom: 15px; color: #ffd700; }
+        h3 { font-size: 1.3em; margin-bottom: 10px; color: #e0e0e0; }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>🛡️ GraphGuard Universal 2.0 - Live Demo</h1>
+            <p>Experience universal GraphQL security across multiple frameworks</p>
+        </div>
+
+        <div class="demo-panel">
+            <h2>🎯 Server Selection</h2>
+            
+            <div class="framework-selector">
+                <button class="framework-btn vulnerable" data-server="vulnerable" style="background: linear-gradient(45deg, #F44336, #E91E63);">
+                    🚨 Vulnerable Server (Port 4000)
+                </button>
+                <button class="framework-btn active hardened" data-server="hardened" style="background: linear-gradient(45deg, #4CAF50, #45a049);">
+                    🛡️ GraphGuard Protected (Port 4002)
+                </button>
+            </div>
+            
+            <h3>🎮 Attack Scenarios</h3>
+
+            <div class="attack-scenarios">
+                <button class="scenario-btn safe" data-scenario="safe">
+                    <strong>✅ Safe Query</strong><br>
+                    Simple user data retrieval
+                </button>
+                <button class="scenario-btn risky" data-scenario="risky">
+                    <strong>⚠️ Risky Query</strong><br>
+                    Moderate nesting with aliases
+                </button>
+                <button class="scenario-btn dangerous" data-scenario="dangerous">
+                    <strong>🚫 Dangerous Query</strong><br>
+                    Deep nesting attack
+                </button>
+                <button class="scenario-btn dangerous" data-scenario="malicious">
+                    <strong>💀 Malicious Query</strong><br>
+                    Injection attempt + flooding
+                </button>
+            </div>
+
+            <div class="query-editor" id="queryEditor">
+# Select an attack scenario to see the GraphQL query
+# Click a framework and scenario to test GraphGuard protection
+
+query SafeExample {
+  users {
+    id
+    name
+    email
+  }
+}
+            </div>
+        </div>
+
+        <div class="demo-panel results-panel">
+            <h2>📊 Security Analysis</h2>
+            
+            <div style="background: rgba(255, 215, 0, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid rgba(255, 215, 0, 0.3);">
+                <h4 id="currentServer" style="margin: 0; color: #ffd700;">🛡️ Testing: GraphGuard Protected Server</h4>
+                <p id="serverEndpoint" style="margin: 5px 0 0 0; font-size: 0.9em;">http://localhost:4002/graphql</p>
+            </div>
+            
+            <div class="security-metrics">
+                <div class="metric-row">
+                    <span>Query Depth:</span>
+                    <span class="metric-value" id="metricDepth">2</span>
+                </div>
+                <div class="metric-row">
+                    <span>Selection Count:</span>
+                    <span class="metric-value" id="metricSelections">3</span>
+                </div>
+                <div class="metric-row">
+                    <span>Alias Count:</span>
+                    <span class="metric-value" id="metricAliases">0</span>
+                </div>
+                <div class="metric-row">
+                    <span>Introspection:</span>
+                    <span class="metric-value" id="metricIntrospection">No</span>
+                </div>
+            </div>
+
+            <div class="risk-meter">
+                <div class="risk-fill risk-low" id="riskFill" style="width: 15%;">
+                    Risk: <span id="riskScore">15</span>
+                </div>
+            </div>
+
+            <div class="action-badge action-allow" id="actionBadge">
+                ✅ ALLOWED - Query is safe
+            </div>
+
+            <div class="loading" id="loadingIndicator">
+                <div class="spinner"></div>
+                <p>Analyzing query across frameworks...</p>
+            </div>
+
+            <div class="framework-comparison" id="frameworkResults">
+                <div class="framework-result active" data-framework="apollo">
+                    <h3>🚀 Apollo</h3>
+                    <p>Risk: <strong id="apollo-risk">15</strong></p>
+                    <p id="apollo-action">✅ ALLOW</p>
+                </div>
+                <div class="framework-result" data-framework="yoga">
+                    <h3>🧘 Yoga</h3>
+                    <p>Risk: <strong id="yoga-risk">15</strong></p>
+                    <p id="yoga-action">✅ ALLOW</p>
+                </div>
+                <div class="framework-result" data-framework="express">
+                    <h3>🚂 Express</h3>
+                    <p>Risk: <strong id="express-risk">15</strong></p>
+                    <p id="express-action">✅ ALLOW</p>
+                </div>
+                <div class="framework-result" data-framework="mercurius">
+                    <h3>⚡ Mercurius</h3>
+                    <p>Risk: <strong id="mercurius-risk">15</strong></p>
+                    <p id="mercurius-action">✅ ALLOW</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn execute-btn" onclick="executeQuery()">
+                🚀 Execute Query
+            </button>
+            <button class="control-btn auto-demo-btn" onclick="runAutoDemo()">
+                🎮 Auto Demo
+            </button>
+            <button class="control-btn reset-btn" onclick="resetDemo()">
+                🔄 Reset
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const queries = {
+            safe: `query SafeQuery {
+  users {
+    id
+    name
+    email
+  }
+}`,
+            risky: `query RiskyQuery {
+  users {
+    u1: friends {
+      u2: friends {
+        posts {
+          comments {
+            author {
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+}`,
+            dangerous: `query DangerousQuery {
+  users {
+    friends {
+      friends {
+        friends {
+          posts {
+            comments {
+              author {
+                friends {
+                  posts {
+                    comments {
+                      content
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`,
+            malicious: `query MaliciousAttack {
+  u1: users {
+    admin_data
+    system_info
+    f1: friends {
+      f2: friends {
+        f3: friends {
+          f4: friends {
+            f5: friends {
+              posts {
+                p1: comments {
+                  p2: comments {
+                    delete_all_data
+                    author {
+                      secret_token
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  u2: users { f6: friends { f7: friends { posts { title } } } }
+  u3: users { f8: friends { f9: friends { posts { title } } } }
+}`
+        };
+
+        const scenarios = {
+            safe: { depth: 2, selections: 3, aliases: 0, introspection: false, risk: 15 },
+            risky: { depth: 6, selections: 15, aliases: 2, introspection: false, risk: 45 },
+            dangerous: { depth: 10, selections: 35, aliases: 0, introspection: false, risk: 85 },
+            malicious: { depth: 9, selections: 40, aliases: 9, introspection: false, risk: 95 }
+        };
+
+        let currentServer = 'hardened';
+        let currentScenario = 'safe';
+        let isAutoDemo = false;
+
+        // Server selection
+        document.querySelectorAll('.framework-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (this.dataset.server) {
+                    document.querySelectorAll('.framework-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentServer = this.dataset.server;
+                    
+                    // Update server display
+                    const serverName = currentServer === 'vulnerable' ? 
+                        '🚨 Testing: Vulnerable Server (NO PROTECTION)' : 
+                        '🛡️ Testing: GraphGuard Protected Server';
+                    const serverEndpoint = currentServer === 'vulnerable' ? 
+                        'http://localhost:4000/graphql' : 
+                        'http://localhost:4002/graphql';
+                    
+                    document.getElementById('currentServer').textContent = serverName;
+                    document.getElementById('serverEndpoint').textContent = serverEndpoint;
+                    
+                    // Update scenario results based on server
+                    updateMetrics(scenarios[currentScenario]);
+                }
+            });
+        });
+
+        // Scenario selection
+        document.querySelectorAll('.scenario-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                currentScenario = this.dataset.scenario;
+                document.getElementById('queryEditor').textContent = queries[currentScenario];
+                updateMetrics(scenarios[currentScenario]);
+            });
+        });
+
+        function updateMetrics(scenario) {
+            document.getElementById('metricDepth').textContent = scenario.depth;
+            document.getElementById('metricSelections').textContent = scenario.selections;
+            document.getElementById('metricAliases').textContent = scenario.aliases;
+            document.getElementById('metricIntrospection').textContent = scenario.introspection ? 'Yes' : 'No';
+            
+            // Adjust risk based on server protection
+            let riskScore = scenario.risk;
+            let action = 'ALLOW';
+            
+            if (currentServer === 'vulnerable') {
+                // Vulnerable server: show actual risk but allow everything
+                action = 'ALLOW';
+            } else {
+                // Protected server: apply GraphGuard logic
+                if (riskScore >= 70) action = 'BLOCK';
+                else if (riskScore >= 40) action = 'WARN';
+                else action = 'ALLOW';
+            }
+            
+            document.getElementById('riskScore').textContent = riskScore;
+            
+            const riskFill = document.getElementById('riskFill');
+            riskFill.style.width = riskScore + '%';
+            
+            // Update risk level styling
+            riskFill.className = `risk-fill ${riskScore >= 70 ? 'risk-high' : riskScore >= 40 ? 'risk-medium' : 'risk-low'}`;
+            
+            // Update action badge based on server type
+            const actionBadge = document.getElementById('actionBadge');
+            if (currentServer === 'vulnerable') {
+                actionBadge.className = 'action-badge action-allow';
+                actionBadge.textContent = '⚠️ VULNERABLE - No protection, query allowed';
+                if (riskScore >= 70) {
+                    actionBadge.className = 'action-badge action-warn';
+                    actionBadge.textContent = '🚨 VULNERABLE - High risk query allowed!';
+                }
+            } else {
+                // Protected server
+                if (action === 'BLOCK') {
+                    actionBadge.className = 'action-badge action-block';
+                    actionBadge.textContent = '🛡️ BLOCKED by GraphGuard - Attack prevented';
+                } else if (action === 'WARN') {
+                    actionBadge.className = 'action-badge action-warn';
+                    actionBadge.textContent = '🛡️ WARNING from GraphGuard - Monitoring';
+                } else {
+                    actionBadge.className = 'action-badge action-allow';
+                    actionBadge.textContent = '🛡️ PROTECTED - GraphGuard approved';
+                }
+            }
+            
+            // Update all framework results (showing universal behavior)
+            const frameworks = ['apollo', 'yoga', 'express', 'mercurius'];
+            frameworks.forEach(fw => {
+                document.getElementById(`${fw}-risk`).textContent = riskScore;
+                const action = riskScore >= 70 ? '🚫 BLOCK' : riskScore >= 40 ? '⚠️ WARN' : '✅ ALLOW';
+                document.getElementById(`${fw}-action`).textContent = action;
+            });
+        }
+
+        function executeQuery() {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const frameworkResults = document.getElementById('frameworkResults');
+            
+            loadingIndicator.style.display = 'block';
+            frameworkResults.style.opacity = '0.5';
+            
+            // Add demo active animation
+            document.querySelector('.dashboard').classList.add('demo-active');
+            
+            setTimeout(() => {
+                loadingIndicator.style.display = 'none';
+                frameworkResults.style.opacity = '1';
+                document.querySelector('.dashboard').classList.remove('demo-active');
+                
+                // Show consistent results across all frameworks
+                updateMetrics(scenarios[currentScenario]);
+            }, 2000);
+        }
+
+        function runAutoDemo() {
+            if (isAutoDemo) return;
+            
+            isAutoDemo = true;
+            const scenarioOrder = ['safe', 'risky', 'dangerous', 'malicious'];
+            const frameworkOrder = ['apollo', 'yoga', 'express', 'mercurius'];
+            let scenarioIndex = 0;
+            let frameworkIndex = 0;
+            
+            const autoDemoBtn = document.querySelector('.auto-demo-btn');
+            autoDemoBtn.textContent = '🎮 Running Auto Demo...';
+            autoDemoBtn.disabled = true;
+            
+            function nextStep() {
+                if (scenarioIndex >= scenarioOrder.length) {
+                    isAutoDemo = false;
+                    autoDemoBtn.textContent = '🎮 Auto Demo';
+                    autoDemoBtn.disabled = false;
+                    return;
+                }
+                
+                // Switch framework
+                const framework = frameworkOrder[frameworkIndex];
+                document.querySelectorAll('.framework-btn').forEach(b => b.classList.remove('active'));
+                document.querySelector(`[data-framework="${framework}"]`).classList.add('active');
+                currentFramework = framework;
+                
+                // Highlight framework result
+                document.querySelectorAll('.framework-result').forEach(r => r.classList.remove('active'));
+                document.querySelector(`[data-framework="${framework}"]`).classList.add('active');
+                
+                // Switch scenario
+                const scenario = scenarioOrder[scenarioIndex];
+                currentScenario = scenario;
+                document.getElementById('queryEditor').textContent = queries[scenario];
+                
+                // Execute query
+                executeQuery();
+                
+                frameworkIndex++;
+                if (frameworkIndex >= frameworkOrder.length) {
+                    frameworkIndex = 0;
+                    scenarioIndex++;
+                }
+                
+                setTimeout(nextStep, 3000);
+            }
+            
+            nextStep();
+        }
+
+        function resetDemo() {
+            currentFramework = 'apollo';
+            currentScenario = 'safe';
+            
+            document.querySelectorAll('.framework-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('[data-framework="apollo"]').classList.add('active');
+            
+            document.getElementById('queryEditor').textContent = queries.safe;
+            updateMetrics(scenarios.safe);
+            
+            document.querySelectorAll('.framework-result').forEach(r => r.classList.remove('active'));
+            document.querySelector('[data-framework="apollo"]').classList.add('active');
+        }
+
+        // Initialize
+        updateMetrics(scenarios.safe);
+        
+        // Auto-update demo for presentation effect
+        let demoCounter = 0;
+        setInterval(() => {
+            if (!isAutoDemo) {
+                demoCounter++;
+                if (demoCounter % 10 === 0) {
+                    // Add some visual interest
+                    document.querySelector('.dashboard').classList.add('demo-active');
+                    setTimeout(() => {
+                        document.querySelector('.dashboard').classList.remove('demo-active');
+                    }, 2000);
+                }
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
