@@ -282,39 +282,39 @@
 <body>
     <div class="dashboard">
         <div class="header">
-            <h1>🛡️ GraphGuard Universal 2.0 - Live Demo</h1>
-            <p>Experience universal GraphQL security across multiple frameworks</p>
+            <h1>GraphGuard Universal 2.0 - Live Demo</h1>
+            <p>Experience universal GraphQL security on Apollo Server</p>
         </div>
 
         <div class="demo-panel">
-            <h2>🎯 Server Selection</h2>
+            <h2>Server Selection</h2>
             
             <div class="framework-selector">
                 <button class="framework-btn vulnerable" data-server="vulnerable" style="background: linear-gradient(45deg, #F44336, #E91E63);">
-                    🚨 Vulnerable Server (Port 4000)
+                    Vulnerable Server (Port 4000)
                 </button>
                 <button class="framework-btn active hardened" data-server="hardened" style="background: linear-gradient(45deg, #4CAF50, #45a049);">
-                    🛡️ GraphGuard Protected (Port 4002)
+                    GraphGuard Protected (Port 4002)
                 </button>
             </div>
             
-            <h3>🎮 Attack Scenarios</h3>
+            <h3>Attack Scenarios</h3>
 
             <div class="attack-scenarios">
                 <button class="scenario-btn safe" data-scenario="safe">
-                    <strong>✅ Safe Query</strong><br>
+                    <strong>[SAFE] Safe Query</strong><br>
                     Simple user data retrieval
                 </button>
                 <button class="scenario-btn risky" data-scenario="risky">
-                    <strong>⚠️ Risky Query</strong><br>
+                    <strong>[RISKY] Risky Query</strong><br>
                     Moderate nesting with aliases
                 </button>
                 <button class="scenario-btn dangerous" data-scenario="dangerous">
-                    <strong>🚫 Dangerous Query</strong><br>
+                    <strong>[DANGEROUS] Dangerous Query</strong><br>
                     Deep nesting attack
                 </button>
                 <button class="scenario-btn dangerous" data-scenario="malicious">
-                    <strong>💀 Malicious Query</strong><br>
+                    <strong>[MALICIOUS] Malicious Query</strong><br>
                     Injection attempt + flooding
                 </button>
             </div>
@@ -334,7 +334,7 @@ query SafeExample {
         </div>
 
         <div class="demo-panel results-panel">
-            <h2>📊 Security Analysis</h2>
+            <h2>Security Analysis</h2>
             
             <div style="background: rgba(255, 215, 0, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid rgba(255, 215, 0, 0.3);">
                 <h4 id="currentServer" style="margin: 0; color: #ffd700;">🛡️ Testing: GraphGuard Protected Server</h4>
@@ -375,39 +375,22 @@ query SafeExample {
                 <p>Analyzing query across frameworks...</p>
             </div>
 
-            <div class="framework-comparison" id="frameworkResults">
-                <div class="framework-result active" data-framework="apollo">
-                    <h3>🚀 Apollo</h3>
-                    <p>Risk: <strong id="apollo-risk">15</strong></p>
-                    <p id="apollo-action">✅ ALLOW</p>
-                </div>
-                <div class="framework-result" data-framework="yoga">
-                    <h3>🧘 Yoga</h3>
-                    <p>Risk: <strong id="yoga-risk">15</strong></p>
-                    <p id="yoga-action">✅ ALLOW</p>
-                </div>
-                <div class="framework-result" data-framework="express">
-                    <h3>🚂 Express</h3>
-                    <p>Risk: <strong id="express-risk">15</strong></p>
-                    <p id="express-action">✅ ALLOW</p>
-                </div>
-                <div class="framework-result" data-framework="mercurius">
-                    <h3>⚡ Mercurius</h3>
-                    <p>Risk: <strong id="mercurius-risk">15</strong></p>
-                    <p id="mercurius-action">✅ ALLOW</p>
-                </div>
+            <div class="server-info" style="background: rgba(0, 0, 0, 0.3); padding: 20px; border-radius: 10px; margin-top: 20px;">
+                <h3 id="currentServer">Testing: GraphGuard Protected Server</h3>
+                <p><strong>Endpoint:</strong> <span id="serverEndpoint">http://localhost:4002/graphql</span></p>
+                <p><strong>Framework:</strong> Apollo Server v4</p>
             </div>
         </div>
 
         <div class="controls">
             <button class="control-btn execute-btn" onclick="executeQuery()">
-                🚀 Execute Query
+                Execute Query
             </button>
             <button class="control-btn auto-demo-btn" onclick="runAutoDemo()">
-                🎮 Auto Demo
+                Auto Demo
             </button>
             <button class="control-btn reset-btn" onclick="resetDemo()">
-                🔄 Reset
+                Reset
             </button>
         </div>
     </div>
@@ -510,8 +493,8 @@ query SafeExample {
                     
                     // Update server display
                     const serverName = currentServer === 'vulnerable' ? 
-                        '🚨 Testing: Vulnerable Server (NO PROTECTION)' : 
-                        '🛡️ Testing: GraphGuard Protected Server';
+                        'Testing: Vulnerable Server (NO PROTECTION)' : 
+                        'Testing: GraphGuard Protected Server';
                     const serverEndpoint = currentServer === 'vulnerable' ? 
                         'http://localhost:4000/graphql' : 
                         'http://localhost:4002/graphql';
@@ -566,22 +549,22 @@ query SafeExample {
             const actionBadge = document.getElementById('actionBadge');
             if (currentServer === 'vulnerable') {
                 actionBadge.className = 'action-badge action-allow';
-                actionBadge.textContent = '⚠️ VULNERABLE - No protection, query allowed';
+                actionBadge.textContent = 'VULNERABLE - No protection, query allowed';
                 if (riskScore >= 70) {
                     actionBadge.className = 'action-badge action-warn';
-                    actionBadge.textContent = '🚨 VULNERABLE - High risk query allowed!';
+                    actionBadge.textContent = 'VULNERABLE - High risk query allowed!';
                 }
             } else {
                 // Protected server
                 if (action === 'BLOCK') {
                     actionBadge.className = 'action-badge action-block';
-                    actionBadge.textContent = '🛡️ BLOCKED by GraphGuard - Attack prevented';
+                    actionBadge.textContent = 'BLOCKED by GraphGuard - Attack prevented';
                 } else if (action === 'WARN') {
                     actionBadge.className = 'action-badge action-warn';
-                    actionBadge.textContent = '🛡️ WARNING from GraphGuard - Monitoring';
+                    actionBadge.textContent = 'WARNING from GraphGuard - Monitoring';
                 } else {
                     actionBadge.className = 'action-badge action-allow';
-                    actionBadge.textContent = '🛡️ PROTECTED - GraphGuard approved';
+                    actionBadge.textContent = 'PROTECTED - GraphGuard approved';
                 }
             }
             

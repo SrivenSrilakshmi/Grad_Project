@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import * as validator from 'express-validator';
-
-const { body, validationResult } = validator;
+import * as expressValidator from 'express-validator';
+const { body, validationResult } = expressValidator;
 
 const validateUserInput = [
     body('username').isString().isLength({ min: 3 }).withMessage('Username must be at least 3 characters long'),
