@@ -67,11 +67,19 @@ class UniversalGraphGuard {
       injections: this.checkInjectionPatterns(queryString),
       length: queryString.length,
       operationType: operation.operation,
-      complexity: 0 // Will be calculated
+      complexity: 0, // Will be calculated
+      fieldDuplication: this.countFieldDuplication(document),
+      circularRisk: this.detectCircularReferences(operation),
+      listMultiplier: this.calculateListMultiplier(operation),
+      argumentComplexity: this.analyzeArguments(operation),
+      estimatedTime: 0 // Will be calculated
     };
 
     // Calculate complexity score
     metrics.complexity = this.calculateComplexity(metrics);
+    
+    // Calculate estimated execution time (ms)
+    metrics.estimatedTime = this.estimateExecutionTime(metrics);
     
     // Calculate risk score
     const risk = this.calculateRiskScore(metrics);
@@ -151,16 +159,78 @@ class UniversalGraphGuard {
   }
 
   containsIntrospection(document) {
-    let found = false;
+    const introspectionData = {
+      detected: false,
+      type: null,
+      fields: [],
+      severity: 'none' // none, low, medium, high, critical
+    };
+    
     visit(document, {
       Field(field) {
         const name = field.name.value;
-        if (name === '__schema' || name === '__type' || name === '__typename') {
-          found = true;
+        
+        // Critical introspection - full schema exposure
+        if (name === '__schema') {
+          introspectionData.detected = true;
+          introspectionData.type = 'FULL_SCHEMA';
+          introspectionData.severity = 'critical';
+          introspectionData.fields.push({
+            field: '__schema',
+            risk: 'Exposes entire API structure, types, queries, mutations'
+          });
+        }
+        
+        // High-risk introspection - type system details
+        if (name === '__type') {
+          introspectionData.detected = true;
+          if (!introspectionData.type) introspectionData.type = 'TYPE_INSPECTION';
+          if (introspectionData.severity !== 'critical') {
+            introspectionData.severity = 'high';
+          }
+          introspectionData.fields.push({
+            field: '__type',
+            risk: 'Reveals specific type details and field structure'
+          });
+        }
+        
+        // Medium-risk - typename detection
+        if (name === '__typename') {
+          introspectionData.detected = true;
+          if (!introspectionData.type) introspectionData.type = 'TYPENAME_ONLY';
+          if (!['critical', 'high'].includes(introspectionData.severity)) {
+            introspectionData.severity = 'medium';
+          }
+          introspectionData.fields.push({
+            field: '__typename',
+            risk: 'Reveals object type information'
+          });
+        }
+        
+        // Advanced introspection patterns
+        if (name.startsWith('__')) {
+          // Catch other introspection fields like __InputValue, __Field, __Directive
+          const advancedFields = [
+            '__InputValue', '__Field', '__Directive', '__EnumValue',
+            '__TypeKind', '__DirectiveLocation'
+          ];
+          
+          if (advancedFields.includes(name)) {
+            introspectionData.detected = true;
+            if (!introspectionData.type) introspectionData.type = 'ADVANCED_INTROSPECTION';
+            if (!['critical', 'high'].includes(introspectionData.severity)) {
+              introspectionData.severity = 'high';
+            }
+            introspectionData.fields.push({
+              field: name,
+              risk: 'Advanced schema introspection - metadata exposure'
+            });
+          }
         }
       }
     });
-    return found;
+    
+    return introspectionData;
   }
 
   checkInjectionPatterns(queryString) {
@@ -170,8 +240,45 @@ class UniversalGraphGuard {
   }
 
   calculateComplexity(metrics) {
-    // Simple complexity calculation (can be enhanced)
-    return (metrics.depth * 2) + (metrics.selections * 0.5) + metrics.aliases;
+    // Enhanced complexity calculation with new metrics
+    let complexity = (metrics.depth * 2) + (metrics.selections * 0.5) + metrics.aliases;
+    
+    // Add field duplication penalty
+    complexity += metrics.fieldDuplication * 0.3;
+    
+    // Add circular reference penalty
+    complexity += metrics.circularRisk * 5;
+    
+    // Add list multiplier penalty (exponential growth)
+    complexity += metrics.listMultiplier * 10;
+    
+    // Add argument complexity
+    complexity += metrics.argumentComplexity;
+    
+    return complexity;
+  }
+
+  estimateExecutionTime(metrics) {
+    // Estimate query execution time in milliseconds
+    // Based on empirical data: depth, selections, and complexity
+    let baseTime = 10; // Base query time: 10ms
+    
+    // Depth increases time exponentially
+    baseTime += Math.pow(metrics.depth, 1.5) * 2;
+    
+    // Selections increase linearly
+    baseTime += metrics.selections * 0.5;
+    
+    // List multipliers cause exponential growth
+    baseTime += metrics.listMultiplier * 50;
+    
+    // Field duplication adds overhead
+    baseTime += metrics.fieldDuplication * 2;
+    
+    // Circular references are extremely slow
+    baseTime += metrics.circularRisk * 100;
+    
+    return Math.round(baseTime);
   }
 
   calculateRiskScore(metrics) {
@@ -188,8 +295,37 @@ class UniversalGraphGuard {
     risk += metrics.aliases;
     if (metrics.aliases > this.config.aliasThreshold) risk += 25;
     
-    // Special penalties
-    if (metrics.introspection) risk += this.config.introspectionCost;
+    // Field duplication penalty
+    risk += metrics.fieldDuplication * 0.5;
+    if (metrics.fieldDuplication > 20) risk += 15;
+    
+    // Circular reference penalty
+    risk += metrics.circularRisk * 10;
+    
+    // List multiplier penalty (exponential growth risk)
+    risk += metrics.listMultiplier * 3;
+    if (metrics.listMultiplier > 10) risk += 20;
+    
+    // Argument complexity penalty
+    risk += metrics.argumentComplexity * 0.3;
+    
+    // Enhanced introspection scoring based on severity
+    if (metrics.introspection.detected) {
+      switch (metrics.introspection.severity) {
+        case 'critical':
+          risk += 70; // __schema queries are extremely dangerous
+          break;
+        case 'high':
+          risk += 50; // __type and advanced introspection
+          break;
+        case 'medium':
+          risk += 30; // __typename
+          break;
+        default:
+          risk += this.config.introspectionCost;
+      }
+    }
+    
     if (metrics.length > this.config.lengthThreshold) risk += 25;
     if (metrics.injections.length > 0) risk += 40;
     
@@ -216,8 +352,33 @@ class UniversalGraphGuard {
       warnings.push(`High alias usage: ${metrics.aliases}`);
     }
     
-    if (metrics.introspection) {
-      warnings.push('Introspection query detected');
+    if (metrics.fieldDuplication > 10) {
+      warnings.push(`Field duplication detected: ${metrics.fieldDuplication} duplicates`);
+    }
+    
+    if (metrics.circularRisk > 0) {
+      warnings.push(`Circular reference risk: ${metrics.circularRisk} potential cycles`);
+    }
+    
+    if (metrics.listMultiplier > 5) {
+      warnings.push(`High list multiplier: ${metrics.listMultiplier}x (exponential growth)`);
+    }
+    
+    if (metrics.argumentComplexity > 20) {
+      warnings.push(`High argument complexity: ${metrics.argumentComplexity}`);
+    }
+    
+    if (metrics.estimatedTime > 1000) {
+      warnings.push(`High estimated execution time: ${metrics.estimatedTime}ms`);
+    }
+    
+    if (metrics.introspection.detected) {
+      warnings.push(
+        `Introspection detected: ${metrics.introspection.type} (severity: ${metrics.introspection.severity.toUpperCase()})`
+      );
+      metrics.introspection.fields.forEach(field => {
+        warnings.push(`  → ${field.field}: ${field.risk}`);
+      });
     }
     
     if (metrics.injections.length > 0) {
@@ -239,6 +400,108 @@ class UniversalGraphGuard {
     } else {
       console.log(message);
     }
+  }
+
+  // Advanced metric calculations
+  countFieldDuplication(document) {
+    const fieldMap = new Map();
+    let duplicates = 0;
+    
+    visit(document, {
+      Field(field) {
+        const fieldName = field.name.value;
+        const count = fieldMap.get(fieldName) || 0;
+        if (count > 0) duplicates++;
+        fieldMap.set(fieldName, count + 1);
+      }
+    });
+    
+    return duplicates;
+  }
+
+  detectCircularReferences(operation) {
+    let circularCount = 0;
+    const fieldPaths = [];
+    
+    const traverse = (node, path = []) => {
+      if (!node || !node.selectionSet) return;
+      
+      for (const selection of node.selectionSet.selections) {
+        if (selection.kind === 'Field') {
+          const fieldName = selection.name.value;
+          const currentPath = [...path, fieldName];
+          
+          // Check if this field appears earlier in the path (circular reference)
+          if (path.includes(fieldName)) {
+            circularCount++;
+          }
+          
+          fieldPaths.push(currentPath.join('.'));
+          traverse(selection, currentPath);
+        }
+      }
+    };
+    
+    traverse(operation);
+    return circularCount;
+  }
+
+  calculateListMultiplier(operation) {
+    let multiplier = 1;
+    
+    const traverse = (node, depth = 0) => {
+      if (!node || !node.selectionSet) return;
+      
+      for (const selection of node.selectionSet.selections) {
+        if (selection.kind === 'Field') {
+          const fieldName = selection.name.value;
+          
+          // Common list/array field names
+          const listPatterns = ['list', 'all', 'many', 's$']; // ends with 's' (plural)
+          const isListField = listPatterns.some(pattern => {
+            if (pattern === 's$') return fieldName.endsWith('s') && fieldName.length > 2;
+            return fieldName.toLowerCase().includes(pattern);
+          });
+          
+          if (isListField) {
+            multiplier *= 2; // Each list level doubles potential results
+          }
+          
+          traverse(selection, depth + 1);
+        }
+      }
+    };
+    
+    traverse(operation);
+    return Math.min(multiplier, 1000); // Cap at 1000x
+  }
+
+  analyzeArguments(operation) {
+    let complexityScore = 0;
+    
+    visit(operation, {
+      Field(field) {
+        if (field.arguments && field.arguments.length > 0) {
+          field.arguments.forEach(arg => {
+            complexityScore += 1;
+            
+            // Check for expensive argument patterns
+            if (arg.value.kind === 'IntValue') {
+              const value = parseInt(arg.value.value);
+              if (value > 1000) complexityScore += 10; // Large limits
+              if (value > 10000) complexityScore += 20; // Massive limits
+            }
+            
+            // String length in arguments
+            if (arg.value.kind === 'StringValue' && arg.value.value.length > 100) {
+              complexityScore += 5;
+            }
+          });
+        }
+      }
+    });
+    
+    return complexityScore;
   }
 }
 

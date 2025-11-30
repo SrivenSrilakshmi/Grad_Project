@@ -296,6 +296,12 @@
                 <button class="framework-btn active hardened" data-server="hardened" style="background: linear-gradient(45deg, #4CAF50, #45a049);">
                     GraphGuard Protected (Port 4002)
                 </button>
+                <button class="framework-btn linkedin" data-server="linkedin" style="background: linear-gradient(45deg, #0077B5, #005582);">
+                    🌐 LinkedIn Production API
+                </button>
+                <button class="framework-btn spacex" data-server="spacex" style="background: linear-gradient(45deg, #005288, #003C66);">
+                    🚀 SpaceX Production API
+                </button>
             </div>
             
             <h3>Attack Scenarios</h3>
@@ -316,6 +322,26 @@
                 <button class="scenario-btn dangerous" data-scenario="malicious">
                     <strong>[MALICIOUS] Malicious Query</strong><br>
                     Injection attempt + flooding
+                </button>
+                <button class="scenario-btn safe" data-scenario="introspection-typename" style="border-left-color: #9C27B0;">
+                    <strong>[INTROSPECTION] __typename</strong><br>
+                    Medium severity - Type exposure
+                </button>
+                <button class="scenario-btn risky" data-scenario="introspection-type" style="border-left-color: #7B1FA2;">
+                    <strong>[INTROSPECTION] __type</strong><br>
+                    High severity - Schema reconnaissance
+                </button>
+                <button class="scenario-btn dangerous" data-scenario="introspection-schema" style="border-left-color: #6A1B9A;">
+                    <strong>[INTROSPECTION] __schema</strong><br>
+                    CRITICAL - Full API exposure
+                </button>
+                <button class="scenario-btn safe" data-scenario="spacex-safe" style="border-left-color: #0077B5;">
+                    <strong>[SPACEX] Safe Launch Query</strong><br>
+                    Production SpaceX API test
+                </button>
+                <button class="scenario-btn dangerous" data-scenario="spacex-dangerous" style="border-left-color: #005288;">
+                    <strong>[SPACEX] Deep Nesting Attack</strong><br>
+                    High-risk production query
                 </button>
             </div>
 
@@ -358,6 +384,30 @@ query SafeExample {
                     <span>Introspection:</span>
                     <span class="metric-value" id="metricIntrospection">No</span>
                 </div>
+                <div class="metric-row">
+                    <span>🔄 Field Duplication:</span>
+                    <span class="metric-value" id="metricFieldDuplication">0</span>
+                </div>
+                <div class="metric-row">
+                    <span>🔁 Circular Risk:</span>
+                    <span class="metric-value" id="metricCircularRisk">0</span>
+                </div>
+                <div class="metric-row">
+                    <span>📊 List Multiplier:</span>
+                    <span class="metric-value" id="metricListMultiplier">1x</span>
+                </div>
+                <div class="metric-row">
+                    <span>⚙️ Argument Complexity:</span>
+                    <span class="metric-value" id="metricArgumentComplexity">0</span>
+                </div>
+                <div class="metric-row">
+                    <span>⏱️ Estimated Time:</span>
+                    <span class="metric-value" id="metricEstimatedTime">10ms</span>
+                </div>
+                <div class="metric-row">
+                    <span>🧮 Total Complexity:</span>
+                    <span class="metric-value" id="metricComplexity">5.5</span>
+                </div>
             </div>
 
             <div class="risk-meter">
@@ -374,24 +424,20 @@ query SafeExample {
                 <div class="spinner"></div>
                 <p>Analyzing query across frameworks...</p>
             </div>
-
-            <div class="server-info" style="background: rgba(0, 0, 0, 0.3); padding: 20px; border-radius: 10px; margin-top: 20px;">
-                <h3 id="currentServer">Testing: GraphGuard Protected Server</h3>
-                <p><strong>Endpoint:</strong> <span id="serverEndpoint">http://localhost:4002/graphql</span></p>
-                <p><strong>Framework:</strong> Apollo Server v4</p>
-            </div>
         </div>
 
         <div class="controls">
             <button class="control-btn execute-btn" onclick="executeQuery()">
-                Execute Query
-            </button>
-            <button class="control-btn auto-demo-btn" onclick="runAutoDemo()">
-                Auto Demo
+                🚀 Execute Query on Real Server
             </button>
             <button class="control-btn reset-btn" onclick="resetDemo()">
-                Reset
+                🔄 Reset Demo
             </button>
+        </div>
+        
+        <div style="text-align: center; padding: 15px; color: rgba(255, 255, 255, 0.7); font-size: 0.9em;">
+            💡 <strong>Tip:</strong> Make sure your servers are running before executing queries!<br>
+            Vulnerable: <code>npm run dev</code> (port 4000) | Protected: <code>npm run hardened</code> (port 4002)
         </div>
     </div>
 
@@ -469,14 +515,168 @@ query SafeExample {
   }
   u2: users { f6: friends { f7: friends { posts { title } } } }
   u3: users { f8: friends { f9: friends { posts { title } } } }
+}`,
+            'spacex-safe': `# Real SpaceX Production API Query
+# Endpoint: https://spacex-production.up.railway.app/
+
+query SafeSpaceXQuery {
+  launches(limit: 5) {
+    id
+    mission_name
+    launch_date_utc
+    rocket {
+      rocket_name
+      rocket_type
+    }
+  }
+}`,
+            'introspection-typename': `# INTROSPECTION ATTACK: __typename (Medium Severity)
+# Reveals object type information
+
+query TypenameIntrospection {
+  users {
+    id
+    name
+    __typename
+    posts {
+      title
+      __typename
+    }
+  }
+}`,
+            'introspection-type': `# INTROSPECTION ATTACK: __type (High Severity)
+# Reveals specific type structure and fields
+
+query TypeIntrospection {
+  __type(name: "User") {
+    name
+    kind
+    fields {
+      name
+      type {
+        name
+        kind
+      }
+      description
+    }
+  }
+}`,
+            'introspection-schema': `# INTROSPECTION ATTACK: __schema (CRITICAL Severity)
+# Exposes entire API structure - Full reconnaissance
+
+query FullSchemaIntrospection {
+  __schema {
+    queryType {
+      name
+    }
+    mutationType {
+      name
+    }
+    types {
+      name
+      kind
+      fields {
+        name
+        type {
+          name
+          kind
+        }
+      }
+    }
+    directives {
+      name
+      locations
+    }
+  }
+}`,
+            'spacex-dangerous': `# Dangerous Deep Query Against SpaceX API
+# This would cause performance issues
+
+query DangerousSpaceXQuery {
+  launches {
+    rocket {
+      rocket_stages
+      rocket {
+        engines {
+          engine_loss_max
+          propellant_1
+          propellant_2
+          engines {
+            version
+            type
+            engines {
+              isp {
+                sea_level
+                vacuum
+              }
+            }
+          }
+        }
+      }
+    }
+    ships {
+      image
+      missions {
+        name
+        flight
+        missions {
+          name
+          missions {
+            flight
+          }
+        }
+      }
+    }
+  }
 }`
         };
 
         const scenarios = {
-            safe: { depth: 2, selections: 3, aliases: 0, introspection: false, risk: 15 },
-            risky: { depth: 6, selections: 15, aliases: 2, introspection: false, risk: 45 },
-            dangerous: { depth: 10, selections: 35, aliases: 0, introspection: false, risk: 85 },
-            malicious: { depth: 9, selections: 40, aliases: 9, introspection: false, risk: 95 }
+            safe: { 
+                depth: 2, selections: 3, aliases: 0, introspection: false, risk: 15,
+                fieldDuplication: 0, circularRisk: 0, listMultiplier: 1, argumentComplexity: 0,
+                estimatedTime: 10, complexity: 5.5
+            },
+            risky: { 
+                depth: 6, selections: 15, aliases: 2, introspection: false, risk: 45,
+                fieldDuplication: 3, circularRisk: 0, listMultiplier: 4, argumentComplexity: 2,
+                estimatedTime: 85, complexity: 25.9
+            },
+            dangerous: { 
+                depth: 10, selections: 35, aliases: 0, introspection: false, risk: 85,
+                fieldDuplication: 5, circularRisk: 1, listMultiplier: 16, argumentComplexity: 0,
+                estimatedTime: 450, complexity: 183.5
+            },
+            malicious: { 
+                depth: 9, selections: 40, aliases: 9, introspection: false, risk: 95,
+                fieldDuplication: 15, circularRisk: 2, listMultiplier: 32, argumentComplexity: 5,
+                estimatedTime: 850, complexity: 359.5
+            },
+            'introspection-typename': { 
+                depth: 3, selections: 6, aliases: 0, introspection: true, risk: 35,
+                fieldDuplication: 2, circularRisk: 0, listMultiplier: 1, argumentComplexity: 0,
+                estimatedTime: 25, complexity: 9.6
+            },
+            'introspection-type': { 
+                depth: 4, selections: 8, aliases: 0, introspection: true, risk: 60,
+                fieldDuplication: 0, circularRisk: 0, listMultiplier: 1, argumentComplexity: 1,
+                estimatedTime: 35, complexity: 13.3
+            },
+            'introspection-schema': { 
+                depth: 5, selections: 13, aliases: 0, introspection: true, risk: 84,
+                fieldDuplication: 0, circularRisk: 0, listMultiplier: 2, argumentComplexity: 1,
+                estimatedTime: 75, complexity: 37.5
+            },
+            'spacex-safe': { 
+                depth: 3, selections: 8, aliases: 0, introspection: false, risk: 18,
+                fieldDuplication: 0, circularRisk: 0, listMultiplier: 2, argumentComplexity: 1,
+                estimatedTime: 45, complexity: 25.3
+            },
+            'spacex-dangerous': { 
+                depth: 9, selections: 52, aliases: 0, introspection: false, risk: 89,
+                fieldDuplication: 8, circularRisk: 3, listMultiplier: 64, argumentComplexity: 0,
+                estimatedTime: 2500, complexity: 695.4
+            }
         };
 
         let currentServer = 'hardened';
@@ -492,12 +692,29 @@ query SafeExample {
                     currentServer = this.dataset.server;
                     
                     // Update server display
-                    const serverName = currentServer === 'vulnerable' ? 
-                        'Testing: Vulnerable Server (NO PROTECTION)' : 
-                        'Testing: GraphGuard Protected Server';
-                    const serverEndpoint = currentServer === 'vulnerable' ? 
-                        'http://localhost:4000/graphql' : 
-                        'http://localhost:4002/graphql';
+                    let serverName, serverEndpoint;
+                    
+                    switch(currentServer) {
+                        case 'vulnerable':
+                            serverName = '🔴 Testing: Vulnerable Server (NO PROTECTION)';
+                            serverEndpoint = 'http://localhost:4000/graphql';
+                            break;
+                        case 'hardened':
+                            serverName = '🛡️ Testing: GraphGuard Protected Server';
+                            serverEndpoint = 'http://localhost:4002/graphql';
+                            break;
+                        case 'linkedin':
+                            serverName = '🌐 Testing: LinkedIn Production GraphQL API';
+                            serverEndpoint = 'https://www.linkedin.com/graphql (captured)';
+                            break;
+                        case 'spacex':
+                            serverName = '🚀 Testing: SpaceX Production GraphQL API';
+                            serverEndpoint = 'https://spacex-production.up.railway.app/';
+                            break;
+                        default:
+                            serverName = '🛡️ Testing: GraphGuard Protected Server';
+                            serverEndpoint = 'http://localhost:4002/graphql';
+                    }
                     
                     document.getElementById('currentServer').textContent = serverName;
                     document.getElementById('serverEndpoint').textContent = serverEndpoint;
@@ -522,6 +739,14 @@ query SafeExample {
             document.getElementById('metricSelections').textContent = scenario.selections;
             document.getElementById('metricAliases').textContent = scenario.aliases;
             document.getElementById('metricIntrospection').textContent = scenario.introspection ? 'Yes' : 'No';
+            
+            // Update enhanced metrics
+            document.getElementById('metricFieldDuplication').textContent = scenario.fieldDuplication;
+            document.getElementById('metricCircularRisk').textContent = scenario.circularRisk;
+            document.getElementById('metricListMultiplier').textContent = scenario.listMultiplier + 'x';
+            document.getElementById('metricArgumentComplexity').textContent = scenario.argumentComplexity;
+            document.getElementById('metricEstimatedTime').textContent = scenario.estimatedTime + 'ms';
+            document.getElementById('metricComplexity').textContent = scenario.complexity;
             
             // Adjust risk based on server protection
             let riskScore = scenario.risk;
@@ -577,24 +802,114 @@ query SafeExample {
             });
         }
 
-        function executeQuery() {
+        async function executeQuery() {
             const loadingIndicator = document.getElementById('loadingIndicator');
-            const frameworkResults = document.getElementById('frameworkResults');
             
             loadingIndicator.style.display = 'block';
-            frameworkResults.style.opacity = '0.5';
             
             // Add demo active animation
             document.querySelector('.dashboard').classList.add('demo-active');
             
-            setTimeout(() => {
-                loadingIndicator.style.display = 'none';
-                frameworkResults.style.opacity = '1';
-                document.querySelector('.dashboard').classList.remove('demo-active');
+            try {
+                // Get current query
+                const query = queries[currentScenario];
                 
-                // Show consistent results across all frameworks
+                // Determine endpoint based on server selection
+                let endpoint;
+                switch(currentServer) {
+                    case 'vulnerable':
+                        endpoint = 'http://localhost:4000/graphql';
+                        break;
+                    case 'hardened':
+                        endpoint = 'http://localhost:4002/graphql';
+                        break;
+                    case 'spacex':
+                        endpoint = 'https://spacex-production.up.railway.app/';
+                        break;
+                    case 'linkedin':
+                        alert('LinkedIn requires authentication. Use Browser DevTools to capture real queries.\nFor demo purposes, showing simulated analysis.');
+                        updateMetrics(scenarios[currentScenario]);
+                        loadingIndicator.style.display = 'none';
+                        document.querySelector('.dashboard').classList.remove('demo-active');
+                        return;
+                    default:
+                        endpoint = 'http://localhost:4002/graphql';
+                }
+                
+                console.log('Executing query against:', endpoint);
+                console.log('Query:', query);
+                
+                // Make actual GraphQL request
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query })
+                });
+                
+                const result = await response.json();
+                
+                console.log('Server response:', result);
+                
+                // Check if query was blocked by GraphGuard
+                if (result.errors) {
+                    const graphGuardError = result.errors.find(err => 
+                        err.message && err.message.includes('GraphGuard')
+                    );
+                    
+                    if (graphGuardError) {
+                        // Extract risk score from error message if available
+                        const riskMatch = graphGuardError.message.match(/risk[:\s=]+(\d+\.?\d*)/i);
+                        const depthMatch = graphGuardError.message.match(/depth[:\s=]+(\d+)/i);
+                        
+                        const detectedRisk = riskMatch ? parseFloat(riskMatch[1]) : scenarios[currentScenario].risk;
+                        const detectedDepth = depthMatch ? parseInt(depthMatch[1]) : scenarios[currentScenario].depth;
+                        
+                        document.getElementById('metricDepth').textContent = detectedDepth;
+                        document.getElementById('metricSelections').textContent = scenarios[currentScenario].selections;
+                        document.getElementById('metricAliases').textContent = scenarios[currentScenario].aliases;
+                        document.getElementById('metricIntrospection').textContent = scenarios[currentScenario].introspection ? 'Yes' : 'No';
+                        document.getElementById('riskScore').textContent = detectedRisk;
+                        
+                        const riskFill = document.getElementById('riskFill');
+                        riskFill.style.width = detectedRisk + '%';
+                        riskFill.className = `risk-fill ${detectedRisk >= 70 ? 'risk-high' : detectedRisk >= 40 ? 'risk-medium' : 'risk-low'}`;
+                        
+                        const actionBadge = document.getElementById('actionBadge');
+                        actionBadge.className = 'action-badge action-block';
+                        actionBadge.textContent = '🚫 BLOCKED by GraphGuard - ' + graphGuardError.message;
+                        
+                        console.log('✅ Query blocked by GraphGuard:', graphGuardError.message);
+                    } else {
+                        // Other error (not GraphGuard)
+                        updateMetrics(scenarios[currentScenario]);
+                        console.log('⚠️ Query error (not GraphGuard):', result.errors);
+                    }
+                } else {
+                    // Query succeeded
+                    updateMetrics(scenarios[currentScenario]);
+                    
+                    const actionBadge = document.getElementById('actionBadge');
+                    if (currentServer === 'vulnerable') {
+                        actionBadge.className = 'action-badge action-warn';
+                        actionBadge.textContent = '⚠️ VULNERABLE - Query executed without protection!';
+                    } else {
+                        actionBadge.className = 'action-badge action-allow';
+                        actionBadge.textContent = '✅ Query executed successfully';
+                    }
+                    
+                    console.log('✅ Query executed successfully');
+                }
+                
+            } catch (error) {
+                console.error('❌ Error executing query:', error);
+                alert(`Error connecting to ${currentServer} server.\n\nMake sure the server is running:\n- Vulnerable: npm run dev (port 4000)\n- Protected: npm run hardened (port 4002)\n\nError: ${error.message}`);
                 updateMetrics(scenarios[currentScenario]);
-            }, 2000);
+            } finally {
+                loadingIndicator.style.display = 'none';
+                document.querySelector('.dashboard').classList.remove('demo-active');
+            }
         }
 
         function runAutoDemo() {

@@ -7,17 +7,16 @@ const complexityLimitRule = (0, graphql_validation_complexity_1.createComplexity
         console.log(`Query cost: ${cost}`);
     },
 });
-const costAnalysisMiddleware = server_1.ApolloServerPlugin, { requestDidStart };
-() => {
-    return {
-        didResolveOperation({ request, document }) {
-            const complexity = complexityLimitRule(document);
-            if (complexity > 100) {
-                throw new Error(`Query is too complex: ${complexity}`);
-            }
-        },
-    };
-},
-;
-;
+const costAnalysisMiddleware = {
+    async requestDidStart() {
+        return {
+            async didResolveOperation({ request, document }) {
+                const complexity = complexityLimitRule(document);
+                if (complexity > 100) {
+                    throw new Error(`Query is too complex: ${complexity}`);
+                }
+            },
+        };
+    },
+};
 exports.default = costAnalysisMiddleware;
