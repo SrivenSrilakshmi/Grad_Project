@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GraphGuard - Sequence Diagram</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: white;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .diagram {
+            width: 700px;
+            background: white;
+            padding: 30px;
+            padding-bottom: 60px;
+            border: 2px solid #333;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: #1e3c72;
+        }
+
+        .actors {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .actor {
+            text-align: center;
+            width: 140px;
+        }
+
+        .actor-box {
+            border: 2px solid #333;
+            padding: 10px;
+            background: #e3f2fd;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .actor-line {
+            width: 2px;
+            background: #999;
+            height: 950px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .sequence-container {
+            position: relative;
+            margin-top: -830px;
+        }
+
+        .interaction {
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .arrow {
+            position: relative;
+            height: 2px;
+            background: #333;
+            margin: 5px 0;
+        }
+
+        .arrow::after {
+            content: '▶';
+            position: absolute;
+            right: -5px;
+            top: -9px;
+            font-size: 12px;
+            color: #333;
+        }
+
+        .arrow-back {
+            background: #666;
+            border-top: 2px dashed #666;
+        }
+
+        .arrow-back::after {
+            content: '◀';
+            left: -5px;
+            right: auto;
+            color: #666;
+        }
+
+        .message {
+            position: absolute;
+            background: white;
+            padding: 3px 8px;
+            font-size: 10px;
+            font-weight: 600;
+            color: #1e3c72;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            border: 1px solid #1e3c72;
+            border-radius: 3px;
+        }
+
+        .activation {
+            position: absolute;
+            width: 12px;
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .process-box {
+            background: #fff8e1;
+            border: 2px solid #f39c12;
+            border-radius: 5px;
+            padding: 8px;
+            margin: 15px 0;
+            font-size: 10px;
+        }
+
+        .process-title {
+            font-weight: bold;
+            color: #f39c12;
+            margin-bottom: 5px;
+        }
+
+        .decision-box {
+            background: #e8f5e9;
+            border: 2px solid #27ae60;
+            border-radius: 5px;
+            padding: 8px;
+            margin: 15px 0;
+            font-size: 10px;
+        }
+
+        .decision-title {
+            font-weight: bold;
+            color: #27ae60;
+            margin-bottom: 5px;
+        }
+
+        .block-box {
+            background: #ffebee;
+            border: 2px solid #e74c3c;
+            border-radius: 5px;
+            padding: 8px;
+            margin: 15px 0;
+            font-size: 10px;
+        }
+
+        .block-title {
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 5px;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: #1e3c72;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .note {
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+            font-style: italic;
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        .timeline {
+            position: absolute;
+            left: -50px;
+            font-size: 9px;
+            color: #999;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="diagram" id="capture">
+        <div class="title">GraphGuard Subsystem Interaction Sequence</div>
+
+        <div class="actors">
+            <div class="actor">
+                <div class="actor-box">Client</div>
+                <div class="actor-line"></div>
+            </div>
+            <div class="actor">
+                <div class="actor-box" style="background: #ffebee;">GraphGuard<br>Middleware</div>
+                <div class="actor-line"></div>
+            </div>
+            <div class="actor">
+                <div class="actor-box" style="background: #fff8e1;">Security<br>Components</div>
+                <div class="actor-line"></div>
+            </div>
+            <div class="actor">
+                <div class="actor-box" style="background: #e8f5e9;">Apollo<br>Server</div>
+                <div class="actor-line"></div>
+            </div>
+        </div>
+
+        <div style="margin-top: -830px; position: relative; padding-left: 10px; padding-bottom: 50px;">
+            
+            <!-- Step 1: Client sends query -->
+            <div style="position: relative; height: 50px; margin-bottom: 10px;">
+                <svg width="700" height="50">
+                    <line x1="70" y1="25" x2="230" y2="25" stroke="#1e3c72" stroke-width="2"/>
+                    <polygon points="230,25 225,22 225,28" fill="#1e3c72"/>
+                    <text x="100" y="20" font-size="11" font-weight="bold" fill="#1e3c72">GraphQL Query</text>
+                </svg>
+            </div>
+
+            <!-- Step 2: GraphGuard intercepts -->
+            <div style="position: relative; height: 85px; margin-bottom: 15px;">
+                <div style="position: absolute; left: 145px; width: 210px; background: white; border: 2px solid #f39c12; border-radius: 5px; padding: 10px; font-size: 10px; z-index: 10;">
+                    <div style="font-weight: bold; color: #f39c12; margin-bottom: 5px;">GraphGuard Interception</div>
+                    • Parse query to AST<br>
+                    • Extract user context<br>
+                    • Route to analysis
+                </div>
+            </div>
+
+            <!-- Step 3: Forward to Security -->
+            <div style="position: relative; height: 50px; margin-bottom: 10px;">
+                <svg width="700" height="50">
+                    <line x1="230" y1="25" x2="390" y2="25" stroke="#1e3c72" stroke-width="2"/>
+                    <polygon points="390,25 385,22 385,28" fill="#1e3c72"/>
+                    <text x="260" y="20" font-size="11" font-weight="bold" fill="#1e3c72">Run Security Checks</text>
+                </svg>
+            </div>
+
+            <!-- Step 4: Security analysis -->
+            <div style="position: relative; height: 95px; margin-bottom: 15px;">
+                <div style="position: absolute; left: 305px; width: 210px; background: white; border: 2px solid #ffc107; border-radius: 5px; padding: 10px; font-size: 10px; z-index: 10;">
+                    <div style="font-weight: bold; color: #f39c12; margin-bottom: 5px;">4 Security Analyzers</div>
+                    ① Complexity (depth, aliases)<br>
+                    ② Authorization (RBAC)<br>
+                    ③ Malicious patterns<br>
+                    ④ Introspection control
+                </div>
+            </div>
+
+            <!-- Step 5: Return metrics -->
+            <div style="position: relative; height: 50px; margin-bottom: 10px;">
+                <svg width="700" height="50">
+                    <line x1="390" y1="25" x2="230" y2="25" stroke="#666" stroke-width="2" stroke-dasharray="5,5"/>
+                    <polygon points="230,25 235,22 235,28" fill="#666"/>
+                    <text x="260" y="20" font-size="11" font-weight="bold" fill="#666">Risk Score</text>
+                </svg>
+            </div>
+
+            <!-- Step 6: Decision -->
+            <div style="position: relative; height: 105px; margin-bottom: 20px;">
+                <div style="position: absolute; left: 145px; width: 210px; background: white; border: 2px solid #27ae60; border-radius: 5px; padding: 10px; font-size: 10px; z-index: 10;">
+                    <div style="font-weight: bold; color: #27ae60; margin-bottom: 5px;">Risk Decision</div>
+                    &lt; 40: <strong style="color: #27ae60;">ALLOW</strong><br>
+                    40-69: <strong style="color: #f39c12;">WARN</strong><br>
+                    ≥ 70: <strong style="color: #e74c3c;">BLOCK</strong><br>
+                    • Log audit trail
+                </div>
+            </div>
+
+            <!-- Diamond decision -->
+            <div style="text-align: center; font-size: 12px; font-weight: bold; color: #333; margin-bottom: 20px;">
+                ◆ Score ≥ 70?
+            </div>
+
+            <!-- Path A: BLOCK (left path) -->
+            <div style="position: relative; height: 100px; margin-bottom: 15px;">
+                <div style="position: absolute; left: 10px; width: 140px; background: white; border: 2px solid #e74c3c; border-radius: 5px; padding: 8px; font-size: 10px; text-align: center; z-index: 10;">
+                    <strong style="color: #e74c3c;">❌ BLOCK</strong><br>
+                    <span style="font-size: 9px;">Return 400 error</span>
+                </div>
+                <svg width="700" height="60" style="position: absolute; top: 55px;">
+                    <line x1="230" y1="15" x2="80" y2="15" stroke="#e74c3c" stroke-width="2"/>
+                    <polygon points="80,15 85,12 85,18" fill="#e74c3c"/>
+                    <text x="110" y="10" font-size="10" font-weight="bold" fill="#e74c3c">Error + Violations</text>
+                </svg>
+            </div>
+
+            <!-- Path B: ALLOW (right path) -->
+            <div style="position: relative; height: 100px; margin-bottom: 15px;">
+                <div style="position: absolute; right: 100px; width: 140px; background: white; border: 2px solid #27ae60; border-radius: 5px; padding: 8px; font-size: 10px; text-align: center; z-index: 10;">
+                    <strong style="color: #27ae60;">✓ ALLOW</strong><br>
+                    <span style="font-size: 9px;">Forward query</span>
+                </div>
+                <svg width="700" height="60" style="position: absolute; top: 55px;">
+                    <line x1="230" y1="15" x2="550" y2="15" stroke="#27ae60" stroke-width="2"/>
+                    <polygon points="550,15 545,12 545,18" fill="#27ae60"/>
+                    <text x="330" y="10" font-size="10" font-weight="bold" fill="#27ae60">Execute Query</text>
+                </svg>
+            </div>
+
+            <!-- Step 7: Apollo executes (only on ALLOW path) -->
+            <div style="position: relative; height: 75px; margin-bottom: 15px;">
+                <div style="position: absolute; left: 465px; width: 170px; background: white; border: 2px solid #1e88e5; border-radius: 5px; padding: 10px; font-size: 10px; z-index: 10;">
+                    <div style="font-weight: bold; color: #1e88e5; margin-bottom: 5px;">Apollo Server</div>
+                    Execute against<br>
+                    resolvers
+                </div>
+            </div>
+
+            <!-- Step 8: Return success -->
+            <div style="position: relative; height: 50px;">
+                <svg width="700" height="50">
+                    <line x1="550" y1="25" x2="70" y2="25" stroke="#27ae60" stroke-width="2" stroke-dasharray="5,5"/>
+                    <polygon points="70,25 75,22 75,28" fill="#27ae60"/>
+                    <text x="240" y="20" font-size="11" font-weight="bold" fill="#27ae60">200 Success + Data</text>
+                </svg>
+            </div>
+
+        </div>
+
+        <div class="note">
+            <strong>Execution Paths:</strong> BLOCK (risk ≥ 70) → Return 400 error | ALLOW (risk < 70) → Forward to Apollo Server<br>
+            <strong>Processing Time:</strong> ~5-15ms middleware overhead | <strong>Components:</strong> 4 security analyzers run in sequence
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <button onclick="captureImage()" style="padding: 12px 24px; font-size: 14px; background: #1e3c72; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            📸 Download Sequence Diagram as PNG
+        </button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        function captureImage() {
+            const element = document.getElementById('capture');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+            
+            // Wait for scroll and render
+            setTimeout(() => {
+                html2canvas(element, {
+                    scale: 2,
+                    backgroundColor: '#ffffff',
+                    windowHeight: element.scrollHeight + 200,
+                    height: element.scrollHeight + 200,
+                    scrollY: 0,
+                    scrollX: 0,
+                    useCORS: true,
+                    allowTaint: true,
+                    logging: false
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'graphguard-sequence-diagram.png';
+                    link.href = canvas.toDataURL('image/png', 1.0);
+                    link.click();
+                });
+            }, 300);
+        }
+    </script>
+</body>
+</html>

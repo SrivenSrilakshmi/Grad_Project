@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GraphGuard Architecture - Report Diagram</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: white;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .diagram {
+            width: 800px;
+            background: white;
+            padding: 30px;
+            border: 2px solid #333;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: #1e3c72;
+        }
+
+        .layer {
+            margin-bottom: 15px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 12px;
+            background: #f8f9fa;
+        }
+
+        .layer-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+
+        .layer-content {
+            font-size: 11px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .components {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .component {
+            border: 1px solid #666;
+            border-radius: 5px;
+            padding: 8px;
+            background: white;
+            font-size: 10px;
+        }
+
+        .component-title {
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: #1e3c72;
+        }
+
+        .arrow {
+            text-align: center;
+            font-size: 24px;
+            color: #333;
+            margin: 8px 0;
+        }
+
+        .metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .metric {
+            background: #1e3c72;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 9px;
+            font-weight: 600;
+        }
+
+        .decision {
+            text-align: center;
+            background: #e8f4f8;
+            border: 2px solid #1e3c72;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 15px 0;
+        }
+
+        .decision-title {
+            font-weight: bold;
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: #1e3c72;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-around;
+            font-size: 11px;
+            margin-top: 8px;
+        }
+
+        .action-item {
+            font-weight: 600;
+        }
+
+        .allow { color: #27ae60; }
+        .warn { color: #f39c12; }
+        .block { color: #e74c3c; }
+
+        .note {
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+            font-style: italic;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="diagram" id="capture">
+        <div class="title">GraphGuard Universal 2.0 Architecture</div>
+
+        <!-- Client Layer -->
+        <div class="layer" style="background: #e3f2fd;">
+            <div class="layer-title">① Client Application</div>
+            <div class="layer-content">Sends GraphQL query via HTTP POST with user context (auth token, role)</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <!-- GraphGuard Layer -->
+        <div class="layer" style="background: #ffebee;">
+            <div class="layer-title">② GraphGuard Middleware (Express)</div>
+            <div class="layer-content">
+                Intercepts request, parses query into AST, routes to security components
+            </div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <!-- Security Components -->
+        <div class="layer" style="background: #fff8e1;">
+            <div class="layer-title">③ Security Analysis Components</div>
+            
+            <div class="components">
+                <div class="component">
+                    <div class="component-title">A. Query Complexity Analyzer</div>
+                    • Depth & cycles<br>
+                    • Alias counting<br>
+                    • Cost estimation
+                </div>
+
+                <div class="component">
+                    <div class="component-title">B. Authorization Validator</div>
+                    • Resolver chain<br>
+                    • RBAC checks<br>
+                    • Field permissions
+                </div>
+
+                <div class="component">
+                    <div class="component-title">C. Malicious Detector</div>
+                    • SQL injection<br>
+                    • XSS patterns<br>
+                    • Anomaly scoring
+                </div>
+
+                <div class="component">
+                    <div class="component-title">D. Introspection Control</div>
+                    • __schema detection<br>
+                    • Production mode<br>
+                    • Environment policy
+                </div>
+            </div>
+
+            <div class="metrics">
+                <div class="metric">Depth</div>
+                <div class="metric">Complexity</div>
+                <div class="metric">Aliases</div>
+                <div class="metric">Cycles</div>
+                <div class="metric">Authorization</div>
+                <div class="metric">SQL/XSS</div>
+                <div class="metric">Introspection</div>
+                <div class="metric">Anomaly</div>
+            </div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <!-- Decision Engine -->
+        <div class="decision">
+            <div class="decision-title">Decision Engine: Risk Score Calculation</div>
+            <div class="actions">
+                <div class="action-item allow">✓ ALLOW (< 40)</div>
+                <div class="action-item warn">⚠ WARN (40-69)</div>
+                <div class="action-item block">✗ BLOCK (≥ 70)</div>
+            </div>
+            <div style="font-size: 10px; margin-top: 8px;">
+                Logs all decisions to audit trail (timestamp, violations, risk score)
+            </div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <!-- Apollo Server -->
+        <div class="layer" style="background: #e8f5e9;">
+            <div class="layer-title">④ Apollo Server (GraphQL Engine)</div>
+            <div class="layer-content">Executes validated queries → Returns data or error to client</div>
+        </div>
+
+        <div class="note">
+            Framework-agnostic middleware • Non-intrusive design • Real-time analysis • Comprehensive audit logging
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <button onclick="captureImage()" style="padding: 12px 24px; font-size: 14px; background: #1e3c72; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            📸 Download as PNG Image
+        </button>
+        <p style="font-size: 12px; color: #666; margin-top: 10px;">
+            Right-click on the diagram and select "Save as..." or use the button above
+        </p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        function captureImage() {
+            const element = document.getElementById('capture');
+            html2canvas(element, {
+                scale: 2,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'graphguard-architecture.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>

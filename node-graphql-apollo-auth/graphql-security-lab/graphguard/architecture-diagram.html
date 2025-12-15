@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GraphGuard Universal 2.0 - Architecture Diagram</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+        }
+
+        .architecture {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .layer {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            border-left: 5px solid;
+            transition: all 0.3s ease;
+        }
+
+        .layer:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .layer-client { border-left-color: #3498db; }
+        .layer-middleware { border-left-color: #e74c3c; }
+        .layer-components { border-left-color: #f39c12; }
+        .layer-server { border-left-color: #27ae60; }
+
+        .layer-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .layer-icon {
+            font-size: 1.8em;
+        }
+
+        .layer-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .component-box {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 2px solid #e0e6ed;
+            flex: 1;
+            min-width: 200px;
+            transition: all 0.3s ease;
+        }
+
+        .component-box:hover {
+            border-color: #667eea;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .component-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .component-desc {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .arrow {
+            text-align: center;
+            font-size: 2em;
+            color: #667eea;
+            margin: 10px 0;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .flow-label {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+            margin: -5px 0;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .metric-badge {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .legend {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .legend-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 4px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ GraphGuard Universal 2.0 Architecture</h1>
+        
+        <div class="architecture">
+            <!-- Layer 1: Client -->
+            <div class="layer layer-client">
+                <div class="layer-title">
+                    <span class="layer-icon">👤</span>
+                    Layer 1: Client Application
+                </div>
+                <div class="layer-content">
+                    <div class="component-box">
+                        <div class="component-title">GraphQL Query</div>
+                        <div class="component-desc">User sends GraphQL query via HTTP POST request</div>
+                    </div>
+                    <div class="component-box">
+                        <div class="component-title">User Context</div>
+                        <div class="component-desc">Authentication token, role information, session data</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow">▼</div>
+            <div class="flow-label">HTTP POST /graphql</div>
+
+            <!-- Layer 2: GraphGuard Middleware -->
+            <div class="layer layer-middleware">
+                <div class="layer-title">
+                    <span class="layer-icon">🛡️</span>
+                    Layer 2: GraphGuard Middleware (Express)
+                </div>
+                <div class="component-box" style="width: 100%; background: linear-gradient(135deg, #fff5f5, #ffe5e5);">
+                    <div class="component-title">🔍 Request Interception</div>
+                    <div class="component-desc">
+                        • Captures HTTP POST requests before reaching Apollo Server<br>
+                        • Extracts query string, variables, and user context<br>
+                        • Parses GraphQL query into Abstract Syntax Tree (AST)<br>
+                        • Routes to security analysis components
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow">▼</div>
+            <div class="flow-label">AST + Context → Security Analysis Pipeline</div>
+
+            <!-- Layer 3: Security Components -->
+            <div class="layer layer-components">
+                <div class="layer-title">
+                    <span class="layer-icon">⚙️</span>
+                    Layer 3: Security Analysis Components
+                </div>
+                
+                <div class="layer-content">
+                    <!-- Component 1 -->
+                    <div class="component-box" style="background: linear-gradient(135deg, #fff5e6, #ffe5cc);">
+                        <div class="component-title">1️⃣ Query Complexity Analyzer</div>
+                        <div class="component-desc">
+                            <strong>Purpose:</strong> Detect resource exhaustion attacks<br><br>
+                            <strong>Analysis:</strong><br>
+                            • AST Traversal & Depth Calculation<br>
+                            • Circular Query Detection<br>
+                            • Alias Counting (DoS Prevention)<br>
+                            • Field Complexity Estimation<br>
+                            • List Multiplier Tracking<br><br>
+                            <strong>Output:</strong> Complexity metrics, depth score
+                        </div>
+                    </div>
+
+                    <!-- Component 2 -->
+                    <div class="component-box" style="background: linear-gradient(135deg, #e6f7ff, #cceeff);">
+                        <div class="component-title">2️⃣ Authorization Path Validator</div>
+                        <div class="component-desc">
+                            <strong>Purpose:</strong> Enforce field-level permissions<br><br>
+                            <strong>Analysis:</strong><br>
+                            • Resolver Chain Reconstruction<br>
+                            • Role-Based Access Control (RBAC)<br>
+                            • Field Permission Mapping<br>
+                            • User Role Verification<br>
+                            • Unauthorized Path Detection<br><br>
+                            <strong>Output:</strong> Authorization status, violations
+                        </div>
+                    </div>
+
+                    <!-- Component 3 -->
+                    <div class="component-box" style="background: linear-gradient(135deg, #f0e6ff, #e0ccff);">
+                        <div class="component-title">3️⃣ Malicious Query Detector</div>
+                        <div class="component-desc">
+                            <strong>Purpose:</strong> Identify attack patterns<br><br>
+                            <strong>Analysis:</strong><br>
+                            • SQL Injection Pattern Matching<br>
+                            • XSS Attempt Detection<br>
+                            • Excessive Argument Length Check<br>
+                            • Suspicious Field Combinations<br>
+                            • Anomaly Score Calculation<br><br>
+                            <strong>Output:</strong> Threat classification, patterns
+                        </div>
+                    </div>
+
+                    <!-- Component 4 -->
+                    <div class="component-box" style="background: linear-gradient(135deg, #e6ffe6, #ccffcc);">
+                        <div class="component-title">4️⃣ Introspection Controller</div>
+                        <div class="component-desc">
+                            <strong>Purpose:</strong> Schema disclosure prevention<br><br>
+                            <strong>Analysis:</strong><br>
+                            • __schema Query Detection<br>
+                            • __type Query Detection<br>
+                            • Production Mode Enforcement<br>
+                            • Environment-Based Policies<br><br>
+                            <strong>Output:</strong> Introspection status
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Metrics -->
+                <div style="margin-top: 20px;">
+                    <div class="component-title" style="text-align: center; margin-bottom: 10px;">
+                        📊 10 Security Metrics Evaluated
+                    </div>
+                    <div class="metrics-grid">
+                        <div class="metric-badge">Query Depth</div>
+                        <div class="metric-badge">Complexity Score</div>
+                        <div class="metric-badge">Alias Count</div>
+                        <div class="metric-badge">Field Count</div>
+                        <div class="metric-badge">Circular Refs</div>
+                        <div class="metric-badge">Auth Status</div>
+                        <div class="metric-badge">Injection Patterns</div>
+                        <div class="metric-badge">XSS Patterns</div>
+                        <div class="metric-badge">Introspection</div>
+                        <div class="metric-badge">Anomaly Score</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow">▼</div>
+            <div class="flow-label">Risk Calculation & Decision Engine</div>
+
+            <!-- Decision Layer -->
+            <div class="layer" style="border-left-color: #9b59b6; background: linear-gradient(135deg, #f3e6ff, #e6ccff);">
+                <div class="layer-title">
+                    <span class="layer-icon">⚖️</span>
+                    Decision Engine
+                </div>
+                <div class="layer-content">
+                    <div class="component-box" style="background: white;">
+                        <div class="component-title">📈 Risk Score Calculation</div>
+                        <div class="component-desc">
+                            Aggregates violation scores:<br>
+                            • Depth Violations: +40 points<br>
+                            • Complexity: +35 points<br>
+                            • Unauthorized Access: +70 points<br>
+                            • Alias Flooding: +40 points<br>
+                            • Introspection: +70 points<br>
+                            • Malicious Patterns: Variable
+                        </div>
+                    </div>
+                    <div class="component-box" style="background: white;">
+                        <div class="component-title">🚦 Action Determination</div>
+                        <div class="component-desc">
+                            <strong style="color: #27ae60;">ALLOW:</strong> Risk < 40<br>
+                            <strong style="color: #f39c12;">WARN:</strong> 40 ≤ Risk < 70<br>
+                            <strong style="color: #e74c3c;">BLOCK:</strong> Risk ≥ 70<br><br>
+                            Returns 400 status with detailed error for BLOCK
+                        </div>
+                    </div>
+                    <div class="component-box" style="background: white;">
+                        <div class="component-title">📝 Audit Logging</div>
+                        <div class="component-desc">
+                            Writes to logs/ directory:<br>
+                            • Timestamp<br>
+                            • Risk score<br>
+                            • Violations<br>
+                            • Query snippet<br>
+                            • User agent & IP<br>
+                            • Action taken
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow">▼</div>
+            <div class="flow-label">Query Forwarded (if ALLOW) or Blocked (if BLOCK)</div>
+
+            <!-- Layer 4: GraphQL Server -->
+            <div class="layer layer-server">
+                <div class="layer-title">
+                    <span class="layer-icon">🖥️</span>
+                    Layer 4: Apollo Server (GraphQL Engine)
+                </div>
+                <div class="layer-content">
+                    <div class="component-box">
+                        <div class="component-title">Schema & Resolvers</div>
+                        <div class="component-desc">Executes validated queries, returns data to client</div>
+                    </div>
+                    <div class="component-box">
+                        <div class="component-title">Database Layer</div>
+                        <div class="component-desc">Fetches data from database, applies business logic</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow">▼</div>
+            <div class="flow-label">GraphQL Response</div>
+
+            <!-- Response -->
+            <div class="layer" style="border-left-color: #16a085;">
+                <div class="layer-title">
+                    <span class="layer-icon">✅</span>
+                    Response to Client
+                </div>
+                <div class="component-box" style="width: 100%; background: #e8f8f5;">
+                    <div class="component-desc">
+                        <strong>Success (200):</strong> { "data": { ... } }<br>
+                        <strong>Blocked (400):</strong> { "errors": [{ "message": "Query blocked by GraphGuard", "extensions": { "code": "GRAPHGUARD_BLOCKED", "riskScore": 85, "violations": [...] } }] }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-title">🔑 Architecture Highlights</div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #3498db;"></div>
+                <span><strong>Non-Intrusive:</strong> GraphGuard operates as middleware without modifying Apollo Server</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #e74c3c;"></div>
+                <span><strong>Real-Time Analysis:</strong> All security checks happen before query execution</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #f39c12;"></div>
+                <span><strong>Modular Design:</strong> Each component is independent and extensible</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #27ae60;"></div>
+                <span><strong>Framework Agnostic:</strong> Works with Apollo, Express-GraphQL, Yoga, and more</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

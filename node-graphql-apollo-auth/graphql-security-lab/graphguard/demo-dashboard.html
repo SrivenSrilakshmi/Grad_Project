@@ -13,8 +13,8 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
+            background: #f5f7fa;
+            color: #2c3e50;
             overflow-x: hidden;
         }
 
@@ -30,19 +30,19 @@
         .header {
             grid-column: 1 / -1;
             text-align: center;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            padding: 25px;
+            background: #ffffff;
             border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid #e0e6ed;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
         .demo-panel {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            background: #ffffff;
             border-radius: 15px;
-            padding: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            border: 1px solid #e0e6ed;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
             display: flex;
             flex-direction: column;
         }
@@ -56,18 +56,21 @@
 
         .framework-btn {
             padding: 10px 20px;
-            border: none;
+            border: 2px solid #e0e6ed;
             border-radius: 25px;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
+            background: #f8f9fa;
+            color: #2c3e50;
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 0.9em;
+            font-weight: 500;
         }
 
         .framework-btn.active {
             background: linear-gradient(45deg, #4CAF50, #45a049);
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            color: white;
+            border-color: #4CAF50;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.25);
         }
 
         .framework-btn:hover {
@@ -84,14 +87,15 @@
 
         .scenario-btn {
             padding: 15px;
-            border: none;
+            border: 1px solid #e0e6ed;
             border-radius: 10px;
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
+            background: #ffffff;
+            color: #2c3e50;
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: left;
             border-left: 4px solid transparent;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .scenario-btn.safe { border-left-color: #4CAF50; }
@@ -99,8 +103,9 @@
         .scenario-btn.dangerous { border-left-color: #F44336; }
 
         .scenario-btn:hover {
-            background: rgba(255, 255, 255, 0.25);
+            background: #f8f9fa;
             transform: translateX(5px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
         }
 
         .query-editor {
@@ -123,10 +128,11 @@
         }
 
         .security-metrics {
-            background: rgba(0, 0, 0, 0.3);
+            background: #ffffff;
             padding: 20px;
             border-radius: 10px;
-            border: 2px solid rgba(255, 215, 0, 0.3);
+            border: 2px solid #e0e6ed;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
         }
 
         .metric-row {
@@ -135,7 +141,8 @@
             align-items: center;
             margin-bottom: 10px;
             padding: 8px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid #e9ecef;
+            color: #2c3e50;
         }
 
         .metric-value {
@@ -146,11 +153,12 @@
         .risk-meter {
             width: 100%;
             height: 25px;
-            background: rgba(255, 255, 255, 0.2);
+            background: #e9ecef;
             border-radius: 12px;
             overflow: hidden;
             margin: 15px 0;
             position: relative;
+            border: 1px solid #dee2e6;
         }
 
         .risk-fill {
@@ -189,17 +197,18 @@
         }
 
         .framework-result {
-            background: rgba(255, 255, 255, 0.1);
+            background: #ffffff;
             padding: 15px;
             border-radius: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            border: 2px solid #e0e6ed;
             text-align: center;
             transition: all 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .framework-result.active {
-            border-color: #ffd700;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            border-color: #4CAF50;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.2);
         }
 
         .controls {
@@ -208,10 +217,10 @@
             justify-content: center;
             gap: 20px;
             padding: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            background: #ffffff;
             border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid #e0e6ed;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
         .control-btn {
@@ -252,8 +261,8 @@
         .spinner {
             width: 40px;
             height: 40px;
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #ffd700;
+            border: 4px solid #e9ecef;
+            border-top: 4px solid #4CAF50;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin: 0 auto 10px;
@@ -269,14 +278,14 @@
         }
 
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); }
-            70% { box-shadow: 0 0 0 20px rgba(255, 215, 0, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(76, 175, 80, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
         }
 
-        h1 { font-size: 2.5em; margin-bottom: 10px; }
-        h2 { font-size: 1.8em; margin-bottom: 15px; color: #ffd700; }
-        h3 { font-size: 1.3em; margin-bottom: 10px; color: #e0e0e0; }
+        h1 { font-size: 2.5em; margin-bottom: 10px; color: #1e3c72; font-weight: 700; }
+        h2 { font-size: 1.8em; margin-bottom: 15px; color: #2a5298; font-weight: 600; }
+        h3 { font-size: 1.3em; margin-bottom: 10px; color: #34495e; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -322,6 +331,10 @@
                 <button class="scenario-btn dangerous" data-scenario="malicious">
                     <strong>[MALICIOUS] Malicious Query</strong><br>
                     Injection attempt + flooding
+                </button>
+                <button class="scenario-btn dangerous" data-scenario="circular" style="border-left-color: #E91E63;">
+                    <strong>[CIRCULAR] Recursive Loop</strong><br>
+                    Circular reference attack
                 </button>
                 <button class="scenario-btn safe" data-scenario="introspection-typename" style="border-left-color: #9C27B0;">
                     <strong>[INTROSPECTION] __typename</strong><br>
@@ -427,17 +440,9 @@ query SafeExample {
         </div>
 
         <div class="controls">
-            <button class="control-btn execute-btn" onclick="executeQuery()">
-                🚀 Execute Query on Real Server
-            </button>
             <button class="control-btn reset-btn" onclick="resetDemo()">
                 🔄 Reset Demo
             </button>
-        </div>
-        
-        <div style="text-align: center; padding: 15px; color: rgba(255, 255, 255, 0.7); font-size: 0.9em;">
-            💡 <strong>Tip:</strong> Make sure your servers are running before executing queries!<br>
-            Vulnerable: <code>npm run dev</code> (port 4000) | Protected: <code>npm run hardened</code> (port 4002)
         </div>
     </div>
 
@@ -515,6 +520,45 @@ query SafeExample {
   }
   u2: users { f6: friends { f7: friends { posts { title } } } }
   u3: users { f8: friends { f9: friends { posts { title } } } }
+}`,
+            'circular': `# CIRCULAR QUERY ATTACK: Recursive Loop (High Severity)
+# Creates circular reference that causes infinite loop
+
+query CircularAttack {
+  users {
+    id
+    name
+    friends {
+      id
+      name
+      friends {
+        id
+        name
+        friends {
+          id
+          name
+          friends {
+            id
+            name
+            friends {
+              id
+              posts {
+                comments {
+                  author {
+                    friends {
+                      posts {
+                        title
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }`,
             'spacex-safe': `# Real SpaceX Production API Query
 # Endpoint: https://spacex-production.up.railway.app/
@@ -651,6 +695,11 @@ query DangerousSpaceXQuery {
                 depth: 9, selections: 40, aliases: 9, introspection: false, risk: 95,
                 fieldDuplication: 15, circularRisk: 2, listMultiplier: 32, argumentComplexity: 5,
                 estimatedTime: 850, complexity: 359.5
+            },
+            circular: { 
+                depth: 12, selections: 22, aliases: 0, introspection: false, risk: 88,
+                fieldDuplication: 12, circularRisk: 35, listMultiplier: 6, argumentComplexity: 1,
+                estimatedTime: 450, complexity: 68.7
             },
             'introspection-typename': { 
                 depth: 3, selections: 6, aliases: 0, introspection: true, risk: 35,
@@ -922,7 +971,7 @@ query DangerousSpaceXQuery {
             let frameworkIndex = 0;
             
             const autoDemoBtn = document.querySelector('.auto-demo-btn');
-            autoDemoBtn.textContent = '🎮 Running Auto Demo...';
+            autoDemoBtn.textContent = 'Running Auto Demo...';
             autoDemoBtn.disabled = true;
             
             function nextStep() {
